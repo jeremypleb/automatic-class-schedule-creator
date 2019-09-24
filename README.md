@@ -1,0 +1,1 @@
+# automatic-class-schedule-creator
