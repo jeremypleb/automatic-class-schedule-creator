@@ -1,0 +1,90 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "brian-wheelhouse-favorite-color"
+  },
+  "basePath": "/",
+  "schemes": [
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/classes": {
+      "x-controller": "classes",
+      "get": {
+        "operationId": "getClasses",
+        "description": "Retrieves the list of class names and course ids",
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          },
+          "400": {
+            "description": "Error in request",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "500": {
+            "description": "Error in server",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "/scheduler": {
+      "x-controller": "scheduler",
+      "put": {
+        "operationId": "createSchedules",
+        "description": "Creates schedules based of the classes selected and sent in body.",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Requested Classes to be schedulized",
+            "required": false,
+            "schema": {
+              "type": "object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          },
+          "400": {
+            "description": "Error in request",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "500": {
+            "description": "Error in server",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  }
+}
