@@ -1,6 +1,6 @@
 'using strict'
 
-exports.createSchedules = function () {
+exports.createSchedules = function (req, res) {
     console.log('entering createSchedule()')
-    return { message: 'createSchedule has been called.' }
+    res.send( { message: 'createSchedule has been called.' } )
 }

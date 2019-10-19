@@ -1,6 +1,6 @@
 'using strict'
 
-exports.getClasses = function () {
+exports.getClasses = function (req, res) {
     console.log('entering getClasses()')
-    return { message: "getClass has been called."}
+    res.send( { message: "getClass has been called."} )
 }
