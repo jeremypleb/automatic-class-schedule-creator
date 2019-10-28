@@ -62,7 +62,23 @@
           week: {
             columnHeaderFormat: { weekday: 'short' }
           }
+        },
+        eventRender: function(info) {
+          console.log(info.el.innerHTML);
+        },
+        select: function(info) {
+          var eventName = prompt('Enter the name of the event');
+          calendar.addEvent({
+            title: eventName,
+            start: info.startStr,
+            end: info.endStr
+          });
+        },
+        eventClick: function(info) {
+          if (info.jsEvent.target.id === 'Delete') {
+            alert("click here"); // Maybe show a modal dialog asking the user if he wants to delete the event.
         }
+      }
       });
 
       calendar.render();
