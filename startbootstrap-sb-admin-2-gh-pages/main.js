@@ -14,7 +14,7 @@ function setTerm() {
     s = document.getElementById("sub");
     s.disabled = false;
     s.innerHTML = "<option>--Select Course--</option>"; //empty (if they change the list)
-    
+
     var list = document.getElementById("sub");
     for (var i in subs) {
         list.add(new Option(subs[i], subs[i]));
@@ -49,7 +49,7 @@ function setCourse() {
         }
     }
 }
- 
+
 //if already in there, dont add.
 function addClass() {
     var table = document.getElementById("myTable");
@@ -196,4 +196,89 @@ var myJson = {
             }
         ]
     }
+}
+
+
+// Calendar Functions. Use addEvents() to add event to calendar.
+
+Date.prototype.getDaysOfCurrentWeek = function(start)
+   {
+       // Array of all days of week
+       var days = [ "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
+   // Calculates date of first day of current week
+   start = start || 0;
+   var today = new Date(this.setHours(0, 0, 0, 0));
+   var day = today.getDay() - start;
+   var date = today.getDate() - day;
+
+   // Then we are calculating all dates of current week and then reformat them into ISOO
+   var daysOfWeek = new Object();
+   for(i = 0; i < 8; i++) {
+       tmp = new Date(today.setDate(date+i));
+       daysOfWeek[days[i]] = tmp.getFullYear()+'-'+(tmp.getMonth()+1)+'-'+tmp.getDate();
+   }
+
+   return daysOfWeek;
+}
+
+var daysToDate = new Date().getDaysOfCurrentWeek(); // gets array like ('nameOfDay' => 0000-00-00)
+var calendar = null;
+
+//Functions for calendar
+function openForm() {
+  document.getElementById("myForm").style.display = "block";
+}
+
+function closeForm() {
+  document.getElementById("myForm").style.display = "none";
+}
+
+//Used when submit button from DOM is clicked. This gets the data from the form and passes it to addEvents()
+
+function putEvents() {
+  var eventName = document.getElementById("eventName").value;
+  var start = document.getElementById("start_time").value;
+  var end = document.getElementById("end_time").value;
+  var days = [];
+  document.querySelectorAll('input[type="checkbox"]:checked').forEach(function(element) {
+    days.push(element.value);
+} );
+  console.log(days);
+  addEvents(eventName, start, end, days)
+}
+
+function addEvents(eventName, start, end, days) {
+  console.log(eventName);
+  console.log(start);
+  console.log(end);
+  console.log(days);
+//  var eventName = document.getElementById("eventName").value;
+//  var start = document.getElementById("start_time").value;
+//  var end = document.getElementById("end_time").value;
+//  console.log(document.querySelectorAll('input[type="checkbox"]:checked'));
+  days.forEach(function(element) {
+    console.log(element);
+    console.log(daysToDate[element]+'T'+ start + ':00');
+//    console.log(document.getElementById('calendar'));
+    calendar.addEvent( {
+      title: eventName,
+      start: daysToDate[element]+'T'+ start + ':00', // here we are setting needed date from array 'days' by day's name which we got from input
+      end: daysToDate[element]+'T'+ end + ':00'     // here's the same
+    } );
+  }
+);
+
+  console.log(calendar.getEvents());
+//  document.getElementById("myForm").reset();
+}
+
+function checkBox() {
+  var checkboxes = document.querySelectorAll('input[type="checkbox"]');
+  var checkedOne = Array.prototype.slice.call(checkboxes).some(x => x.checked);
+
+  document.getElementById('eventSubmit').disabled = true;
+  if (checkedOne && document.getElementById("eventName").value != "" && document.getElementById("start_time").value != "" && document.getElementById("end_time").value != "") {
+    document.getElementById('eventSubmit').disabled = false;
+  }
 }
