@@ -5,6 +5,8 @@ var sub = ""
 var course = ""
 var courseIndex = ""
 var courseFullName = ""
+var calendar = null
+var groupId = 0
 
 function setTerm() {
     t = document.getElementById("term");
@@ -223,7 +225,6 @@ Date.prototype.getDaysOfCurrentWeek = function(start)
 }
 
 var daysToDate = new Date().getDaysOfCurrentWeek(); // gets array like ('nameOfDay' => 0000-00-00)
-var calendar = null;
 
 //Functions for calendar
 function openForm() {
@@ -253,6 +254,7 @@ function addEvents(eventName, start, end, days) {
   console.log(start);
   console.log(end);
   console.log(days);
+  groupId += 1;
 //  var eventName = document.getElementById("eventName").value;
 //  var start = document.getElementById("start_time").value;
 //  var end = document.getElementById("end_time").value;
@@ -264,8 +266,9 @@ function addEvents(eventName, start, end, days) {
     calendar.addEvent( {
       title: eventName,
       start: daysToDate[element]+'T'+ start + ':00', // here we are setting needed date from array 'days' by day's name which we got from input
-      end: daysToDate[element]+'T'+ end + ':00'     // here's the same
-    } );
+      end: daysToDate[element]+'T'+ end + ':00',     // here's the same
+      groupId: groupId
+  },  );
   }
 );
 
