@@ -1,0 +1,15 @@
+[29-Oct-2019 02:54:25 America/Los_Angeles] Opening database
+[29-Oct-2019 02:55:05 America/Los_Angeles] Opening database
+[29-Oct-2019 02:55:44 America/Los_Angeles] Opening database
+[29-Oct-2019 02:55:44 America/Los_Angeles] PHP Parse error:  syntax error, unexpected 'class' (T_CLASS) in /opt/bitnami/apache2/htdocs/db/database.php on line 4
+[29-Oct-2019 02:59:59 America/Los_Angeles] Opening database
+[29-Oct-2019 02:59:59 America/Los_Angeles] createTables
+[29-Oct-2019 02:59:59 America/Los_Angeles] PHP Fatal error:  Uncaught Error: Call to undefined function createCourseTable() in /opt/bitnami/apache2/htdocs/db/database.php:15
+Stack trace:
+#0 /opt/bitnami/apache2/htdocs/db/databaseScript.php(19): Database->createTables()
+#1 {main}
+  thrown in /opt/bitnami/apache2/htdocs/db/database.php on line 15
+[29-Oct-2019 03:02:06 America/Los_Angeles] Opening database
+[29-Oct-2019 03:02:06 America/Los_Angeles] createTables
+[29-Oct-2019 03:02:06 America/Los_Angeles] PHP Warning:  SQLite3::exec(): near &quot;UNSIGNED&quot;: syntax error in /opt/bitnami/apache2/htdocs/db/database.php on line 22
+[29-Oct-2019 03:02:06 America/Los_Angeles] PHP Warning:  SQLite3::exec(): near &quot;UNSIGNED&quot;: syntax error in /opt/bitnami/apache2/htdocs/db/database.php on line 41
