@@ -25,6 +25,7 @@
   <link href='packages/daygrid/main.css' rel='stylesheet' />
   <link href='packages/timegrid/main.css' rel='stylesheet' />
   <link href='packages/bootstrap/main.css' rel='stylesheet' />
+  <link href='style.css' rel='stylesheet' />
 
   <script src='packages/core/main.js'></script>
   <script src='packages/interaction/main.js'></script>
@@ -40,10 +41,11 @@
     document.addEventListener('DOMContentLoaded', function () {
       var calendarEl = document.getElementById('calendar');
 
-      var calendar = new FullCalendar.Calendar(calendarEl, {
+      calendar = new FullCalendar.Calendar(calendarEl, {
         plugins: ['dayGrid', 'bootstrap', 'interaction', 'timeGrid'],
         themeSystem: 'bootstrap',
         selectable: true,
+        editable: true,
         selectOverlap: false,
         eventOverlap: false,
         hiddenDays: [0],
@@ -60,10 +62,12 @@
         },
         views: {
           week: {
-            columnHeaderFormat: { weekday: 'short' }
+            columnHeaderFormat: { weekday: 'long' }
           }
         },
         eventRender: function(info) {
+          console.log(info.el.innerHTML);
+          info.el.querySelector('.fc-title').innerHTML += "<br><i class='far fa-trash-alt pull-right' id='Delete'></i><i class='fa fa-pencil pull-right' id='Edit'></i>";
           console.log(info.el.innerHTML);
         },
         select: function(info) {
@@ -71,14 +75,30 @@
           calendar.addEvent({
             title: eventName,
             start: info.startStr,
-            end: info.endStr
+            end: info.endStr,
+            groupId: groupId += 1
           });
         },
         eventClick: function(info) {
+//          console.log(info.event.id);
           if (info.jsEvent.target.id === 'Delete') {
-            alert("click here"); // Maybe show a modal dialog asking the user if he wants to delete the event.
+//            alert("click here"); // Maybe show a modal dialog asking the user if he wants to delete the event.
+            calendar.getEvents().forEach( function(element) {
+              if(element.groupId == info.event.groupId)
+              {
+                element.remove();
+              }
+//              console.log(element);
+            });
         }
-      }
+        if (info.jsEvent.target.id === 'Edit') {
+//            alert("time to edit"); // Maybe show a modal dialog asking the user if he wants to delete the event.
+            var eventName = prompt('Enter the new name of the event');
+            info.event.setProp("title", eventName);
+        }
+        var test = new Date(info.event.start.getFullYear(), info.event.start.getMonth(), info.event.start.getDate());
+        console.log(test.getDay());
+        }
       });
 
       calendar.render();
@@ -132,11 +152,44 @@
 
           <!-- Page Heading -->
           <div class="d-sm-flex align-items-center justify-content-between mb-4">
-            <h1 class="h3 mb-0 text-gray-800">Calendar</h1>
-            <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
-                class="fas fa-plus fa-sm text-white-50"></i> Add Event</a>
+            <!--        <h1 class="h3 mb-0 text-gray-800">Dashboard</h1> -->
+            <button type="button" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" data-toggle="modal" data-target="#ModalLoginForm"><i
+                class="fas fa-plus fa-sm text-white-50"></i> Add Event</button>
           </div>
 
+          <!-- Modal HTML Markup -->
+          <div id="ModalLoginForm" class="modal fade">
+              <div class="modal-dialog modal-lg" role="document">
+                  <div class="modal-content">
+                      <div class="modal-header">
+                          <h1 class="modal-title">Add Event</h1>
+                      </div>
+                      <div class="modal-body">
+                        <form class="form-container">
+                              <label for="event"><b>Name of Event</b></label>
+                              <input class="form-control" onchange="checkBox()" id="eventName" type="text" placeholder="Enter Name of Event" name="event" required>
+                              <br>
+                              <input class="checkbox-inline" type="checkbox" onchange="checkBox()" id="day" name="monday" value="M"> Monday </input>
+                              <input class="checkbox-inline" type="checkbox" onchange="checkBox()" id="day" name="tuesday" value="T"> Tuesday </input>
+                              <input class="checkbox-inline" type="checkbox" onchange="checkBox()" id="day" name="wednesday" value="W"> Wednesday </input>
+                              <input class="checkbox-inline" type="checkbox" onchange="checkBox()" id="day" name="thursday" value="Th"> Thursday </input>
+                              <input class="checkbox-inline" type="checkbox" onchange="checkBox()" id="day" name="friday" value="F"> Friday </input>
+                              <input class="checkbox-inline" type="checkbox" onchange="checkBox()" id="day" name="saturday" value="S"> Saturday </input>
+                              <br>
+                              <br>
+                              <label for="start_time"><b>Start Time (HH:MM AM/PM)</b></label>
+                              <input class="form-control" onchange="checkBox()" type="time" min="7:00" max="20:00" id="start_time" name="start_time" step="60" required>
+
+                              <label for="end_time"><b>End Time (HH:MM AM/PM)</b></label>
+                              <input class="form-control" onchange="checkBox()" type="time" min="7:00" max="20:00" id="end_time" name="end_time" step="60" required>
+                              <br>
+                              <button type="button" id="eventSubmit" class="btn btn-success" onclick="putEvents()" disabled="true" data-dismiss="modal">Add Event</button>
+                              <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                          </form>
+                      </div>
+                  </div><!-- /.modal-content -->
+              </div><!-- /.modal-dialog -->
+          </div><!-- /.modal -->
 
           <!-- Content Row -->
           <div class="row">
@@ -158,83 +211,6 @@
 
           <!-- Example Row-->
           <div class="row">
-
-            <!-- Earnings (Monthly) Card Example -->
-            <!-- <div class="col-xl-3 col-md-6 mb-4">
-              <div class="card border-left-primary shadow h-100 py-2">
-                <div class="card-body">
-                  <div class="row no-gutters align-items-center">
-                    <div class="col mr-2">
-                      <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Earnings (Monthly)</div>
-                      <div class="h5 mb-0 font-weight-bold text-gray-800">$40,000</div>
-                    </div>
-                    <div class="col-auto">
-                      <i class="fas fa-calendar fa-2x text-gray-300"></i>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div> -->
-
-            <!-- Earnings (Monthly) Card Example -->
-            <!-- <div class="col-xl-3 col-md-6 mb-4">
-              <div class="card border-left-success shadow h-100 py-2">
-                <div class="card-body">
-                  <div class="row no-gutters align-items-center">
-                    <div class="col mr-2">
-                      <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Earnings (Annual)</div>
-                      <div class="h5 mb-0 font-weight-bold text-gray-800">$215,000</div>
-                    </div>
-                    <div class="col-auto">
-                      <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div> -->
-
-            <!-- Earnings (Monthly) Card Example -->
-            <!-- <div class="col-xl-3 col-md-6 mb-4">
-              <div class="card border-left-info shadow h-100 py-2">
-                <div class="card-body">
-                  <div class="row no-gutters align-items-center">
-                    <div class="col mr-2">
-                      <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Tasks</div>
-                      <div class="row no-gutters align-items-center">
-                        <div class="col-auto">
-                          <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">50%</div>
-                        </div>
-                        <div class="col">
-                          <div class="progress progress-sm mr-2">
-                            <div class="progress-bar bg-info" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="col-auto">
-                      <i class="fas fa-clipboard-list fa-2x text-gray-300"></i>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div> -->
-
-            <!-- Pending Requests Card Example -->
-            <!-- <div class="col-xl-3 col-md-6 mb-4">
-              <div class="card border-left-warning shadow h-100 py-2">
-                <div class="card-body">
-                  <div class="row no-gutters align-items-center">
-                    <div class="col mr-2">
-                      <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Pending Requests</div>
-                      <div class="h5 mb-0 font-weight-bold text-gray-800">18</div>
-                    </div>
-                    <div class="col-auto">
-                      <i class="fas fa-comments fa-2x text-gray-300"></i>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div> -->
           </div>
 
           <!-- Content Row -->
