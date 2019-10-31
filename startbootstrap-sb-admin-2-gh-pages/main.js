@@ -90,8 +90,9 @@ function dropClass(rowId) {
 }
 
 //package things up and send to backend
+//TODO add list of evenst to not schedule over
 function submitList() {
-    var classJson = "{'classesToAdd': [";
+    var classJson = "{'term':'"+term +", 'classesToAdd': [";
     var table = document.getElementById("myTable");
     tableLength = table.rows.length;
     console.log(tableLength);
