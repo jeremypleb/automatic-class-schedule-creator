@@ -1,4 +1,4 @@
-// Need to know formats of different things is next step. everything else looks good!
+//TODO linking back and front, displaying multiple schedules in tabs
 var rowCount = 0
 var term = ""
 var sub = ""
@@ -18,6 +18,7 @@ function setTerm() {
     s.disabled = false;
     s.innerHTML = "<option>--Select Course--</option>"; //empty (if they change the list)
 
+    //I pulled all of the subjects from the json and put them in a list here.
     var list = document.getElementById("sub");
     for (var i in subs) {
         list.add(new Option(subs[i], subs[i]));
@@ -93,24 +94,31 @@ function dropClass(rowId) {
 }
 
 //package things up and send to backend
-//TODO add list of evenst to not schedule over
-function submitList() {
+function buildList() {
+    var eventsJSON = JSON.stringify(getFormattedEvents());
     var classJson = "{'term':'"+term +", 'classesToAdd': [";
     var table = document.getElementById("myTable");
     tableLength = table.rows.length;
     console.log(tableLength);
     for (let i = 1; row = table.rows[i]; i++) {
         //only need second col of each row. skip header
+            
         classJson += "{'classId':'"+row.cells[1].innerHTML+"'},";
     }
     classJson = classJson.slice(0, classJson.length-1); //chop the last comma
-    classJson += "}";
+    classJson += ", events:'"+eventsJSON+"}";
     console.log("json: " + classJson);
     return classJson;
 }
 
+//getsStartingList - all classes
 function getClassList(){
     console.log("getting list")
+}
+
+//get schedules from backend, and add to calendar.
+function getSchedule() {
+    
 }
 
 var subs =['A HTG', 'ACC', 'AEROS', 'AFRIK', 'AM ST', 'ANES', 'ANTHR', 'ARAB', 'ARMEN', 'ART', 'ARTED', 'ARTHC', 'ASIAN', 'ASL', 'BIO', 'BULGN', 'C S', 'CAMBO', 'CANT', 'CE EN', 'CEBU', 'CFM', 'CH EN', 'CHEM', 'CHIN', 'CL CV', 'CLSCS', 'CMLIT', 'CMPST', 'COMD', 'COMMS', 'CPSE', 'CREOL', 'CSANM', 'DANCE', 'DANSH', 'DES', 'DESAN', 'DESGD', 'DESIL', 'DESPH', 'DIGHT', 'DUTCH', 'EC EN', 'ECE', 'ECON', 'EDLF', 'EIME', 'EL ED', 'ELANG', 'ENG T', 'ENGL', 'ENT', 'ESL', 'ESTON', 'EUROP', 'EXDM', 'EXSC', 'FHSS', 'FIN', 'FINN', 'FLANG', 'FNART', 'FREN', 'GEOG', 'GEOL', 'GERM', 'GREEK', 'GSCM', 'GWS', 'HAWAI', 'HCOLL', 'HEB', 'HINDI', 'HIST', 'HLTH', 'HMONG', 'HONRS', 'HRM', 'HUNG', 'IAS', 'ICLND', 'ICS', 'IHUM', 'INDES', 'INDON', 'IP&T', 'IS', 'IT&C', 'ITAL', 'JAPAN', 'KICHE', 'KIRIB', 'KOREA', 'LATIN', 'LATVI', 'LAW', 'LFSCI', 'LING', 'LINGC', 'LITHU', 'LT AM', 'M COM', 'MALAG', 'MALAY', 'MATH', 'MBA', 'ME EN', 'MESA', 'MFGEN', 'MFHD', 'MFT', 'MIL S', 'MKTG', 'MMBIO', 'MPA', 'MSB', 'MTHED', 'MUSIC', 'NAVAJ', 'NDFS', 'NE LG', 'NEURO', 'NORWE', 'NURS', 'PDBIO', 'PERSI', 'PETE', 'PHIL', 'PHSCS', 'PHY S', 'PLANG', 'POLI', 'POLSH', 'PORT', 'PSYCH', 'PWS', 'QUECH', 'REL A', 'REL C', 'REL E', 'ROM', 'RUSS', 'SAMOA', 'SC ED', 'SCAND', 'SFL', 'SLAT', 'SLOVK', 'SOC', 'SOC W', 'SPAN', 'STAC', 'STAT', 'STDEV', 'STRAT', 'SWAHI', 'SWED', 'SWELL', 'T ED', 'TAGAL', 'TECH', 'TEE', 'TELL', 'TES', 'TEST', 'THAI', 'TMA', 'TONGA', 'TRM', 'TURK', 'UNIV', 'URDU', 'VIET', 'WELSH', 'WRTG']
@@ -201,7 +209,6 @@ var myJson = {
         ]
     }
 }
-
 
 // Calendar Functions. Use addEvents() to add event to calendar.
 
