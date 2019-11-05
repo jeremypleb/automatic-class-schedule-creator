@@ -49,7 +49,7 @@
       "x-controller": "scheduler",
       "put": {
         "operationId": "createSchedules",
-        "description": "Creates schedules based of the classes selected and sent in body.",
+        "description": "Creates schedules based on the classes and times requested in the request body.",
         "parameters": [
           {
             "in": "body",
@@ -84,6 +84,53 @@
             }
           }
         }
+      }
+    }
+  },
+  "x-mock_json":{
+    "classes": {
+      "list": [
+        {
+          "classId": "cs428",
+          "classTitle": "Software Engineering"
+        },
+        {
+          "classId": "cs330",
+          "classTitle": "Concepts of Programming Languages"
+        },
+        {
+          "classId": "HIST101",
+          "classTitle": "Guns, Germs, and Steal"
+        }
+      ]
+    },
+    "schedule": {
+      "class1": {
+        "classId": "cs428",
+        "classTitle": "Software Engineering",
+        "days": ["M", "T", "W", "Th", "F"],
+        "begin_time": "1400",
+        "end_time": "1630",
+        "building": "LSB",
+        "credit_hours": "3.0"
+      },
+      "class2": {
+        "classId": "cs330",
+        "classTitle": "Programming Languages",
+        "days": ["M", "W", "F"],
+        "begin_time": "0900",
+        "end_time": "0950",
+        "building": "TMCB",
+        "credit_hours": "3.0"
+      },
+      "class3": {
+        "classId": "HIST101",
+        "classTitle": "History Stuff",
+        "days": ["T", "Th"],
+        "begin_time": "1335",
+        "end_time": "1450",
+        "building": "JFSB",
+        "credit_hours": "3.0"
       }
     }
   }
