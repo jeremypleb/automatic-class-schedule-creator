@@ -3,12 +3,16 @@ require_once "MyDB.php";
 
 class Database
 {
+    /*
     function getJsonDataObject()
     {
-        $json = file_get_contents('data/semester-sections-20195.json', true);
-        $jsonArray = json_encode($json, true);
-        echo $jsonArray;
+        // The file is too big
+        $json = file_get_contents('../data/semester-sections-20195.json', true);
+        $jsonArray = json_decode($json, true);
+        error_log( print_r($jsonArray, TRUE) );
+        return $jsonArray;
     }
+    */
 
     function createTables()
     {
@@ -50,8 +54,10 @@ class Database
 
     function loadDatabaseFromJsonFile($jsonArray)
     {
+        $jsonArray = json_decode($jsonArray, true);
+        //$jsonArray = $this->getJsonDataObject();
         $this->loadCourseTable($jsonArray);
-        $this->loadCategoryTable($jsonArray);
+        //$this->loadCategoriesTable($jsonArray);
     }
 
     function loadCourseTable($jsonArray)
@@ -59,28 +65,26 @@ class Database
         // So possibly a course would offer its section, start time and end time, room and building location, credit hours, and days scheduled
 
         $db = new MyDB();
-        for ($i = 0; $i < count($jsonArray); $i++)
+        $sections = $jsonArray['sections'];
+        foreach ($sections as $sectionKey => $sectionValue)
         {
-            $sections = $jsonArray[$i]["sections"];
-            for ($j = 0; $j < count($sections); $j++)
+            $times = $sectionValue["times"];
+            $section = $sectionValue["section_number"];
+            $creditHours = $sectionValue["credit_hours"];
+            foreach ($times as $timesKey => $timesValue)
             {
-                $times = $sections[$j]["times"];
-                $section = $sections[$j]["section_number"];
-                $creditHours = $sections[$j]["credit_hours"];
-                for ($k = 0; $k < count($times); $k++)
-                {
-                    $startTime = $times[$k]["begin_time"];
-                    $endTime = $times[$k]["end_time"];
-                    $roomNumber = $times[$k]["room"];
-                    $building = $times[$k]["building"];
-                    $Monday = $times[$k]["mon"];
-                    $Tuesday = $times[$k]["tue"];
-                    $Wednesday = $times[$k]["wed"];
-                    $Thursday = $times[$k]["thu"];
-                    $Friday = $times[$k]["fri"];
-                    $db->exec("INSERT INTO Course (section, startTime, endTime, roomNumber, building, creditHours, monday, tuesday, wednesday, thursday, friday)
-                    VALUES ($section, $startTime, $endTime, $roomNumber, $building, $creditHours, $Monday, $Tuesday, $Wednesday, $Thursday, $Friday)");
-                }
+                $startTime = $timesValue["begin_time"];
+                $endTime = $timesValue["end_time"];
+                $roomNumber = $timesValue["room"];
+                $building = $timesValue["building"];
+                $Monday = $timesValue["mon"];
+                $Tuesday = $timesValue["tue"];
+                $Wednesday = $timesValue["wed"];
+                $Thursday = $timesValue["thu"];
+                $Friday = $timesValue["fri"];
+                $query = "INSERT INTO Course (section, startTime, endTime, roomNumber, building, creditHours, monday, tuesday, wednesday, thursday, friday)
+                VALUES ('$section', '$startTime', '$endTime', '$roomNumber', '$building', '$creditHours', '$Monday', '$Tuesday', '$Wednesday', '$Thursday', '$Friday')";
+                $db->exec($query);
             }
             
         }

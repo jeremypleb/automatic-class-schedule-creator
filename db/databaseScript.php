@@ -1,6 +1,7 @@
 <?php
 ini_set("log_errors", 1);
 ini_set("error_log", "errors.log");
+ini_set("log_errors_max_len", 0);
 
 error_log("Opening database");
 
@@ -21,8 +22,8 @@ else if ($_POST['method'] == "createTables")
 
 else if ($_POST['method'] == "loadDatabaseFromJsonFile")
 {
-    $jsonArray = json_encode($_POST['json']);
-    $db->loadDatabaseFromJsonFile($jsonArray);
+    //$jsonArray = json_encode($_POST['json']);
+    $db->loadDatabaseFromJsonFile($_POST['jsonValue']);
 }
 
 else if ($_POST['method'] == "grabAllCoursesData")

@@ -10,8 +10,7 @@ ini_set("error_log", "errors.log");
 
 <html>
     <button id = "createTablesButton">Create Tables</button>
-    <button id = "getJsonButton">GetJson</button>
-    <button id = "loadDatabaseButton">Load Database</button>
+    <button onclick = "read_in_file();">Load Database</button>
     <br><br>
 
     <button id = "grabCoursesButton">Get All Courses Data</button>
@@ -21,9 +20,41 @@ ini_set("error_log", "errors.log");
 </html>
 
 <script type = "text/javascript">
+function read_in_file()
+{
+  alert("reading in file");
+  $.getJSON( "../data/semester-sections-20195.json", function( data ) {
+    //data = JSON.parse(data);
+    //data.forEach(loadDatabase);
+    alert("data grabbed");
+    Object.values(data).forEach(loadDatabase);
+  
+  });
+}
+
+function loadDatabase(value)
+{
+  value = JSON.stringify(value);
+  let value2 = "shorter";
+  var data = { "method": "loadDatabaseFromJsonFile", "jsonValue":  value  };
+  $.ajax({
+    type: "post",
+    url: "databaseScript.php",
+    data: data,
+    dataType: "text",
+    success: function(data) {
+      alert(data);
+    },
+    error: function(data) {
+      alert("error");
+      alert(JSON.stringify(data));
+    }
+  });
+
+}
+
 $(document).ready(function()
 {
-    var json;
 
     $('#createTablesButton').click(function(){
     $.ajax({
@@ -35,43 +66,6 @@ $(document).ready(function()
       dataType: "text",
       success: function(data) {
         alert("tables created!");
-      },
-      error: function(data) {
-        alert("error");
-        alert(JSON.stringify(data));
-       }
-    });
-    });
-
-    $('#getJsonButton').click(function(){
-    $.ajax({
-      type: "post",
-      url: "databaseScript.php",
-      data: {
-        method: 'getJsonDataObject'
-      },
-      dataType: "text",
-      success: function(data) {
-            json = data;
-      },
-      error: function(data) {
-        alert("error");
-        alert(JSON.stringify(data));
-       }
-    });
-    });
-
-    $('#loadDatabaseButton').click(function(){
-    $.ajax({
-      type: "post",
-      url: "databaseScript.php",
-      data: {
-        method: 'loadDatabaseFromJsonFile',
-        json: json
-      },
-      dataType: "text",
-      success: function(data) {
-        alert("database loaded!");
       },
       error: function(data) {
         alert("error");
