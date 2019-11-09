@@ -22,13 +22,13 @@ const controllersPath =  path.resolve(__dirname, './src/controllers')
 const enforcer = EnforcerMiddleware(swaggerPath)
 
 //check for explicit mock request
-enforcer.mocks({}, false).catch(console.error)
+//enforcer.mocks({}, false).catch(console.error)
 
 //call defined operation handlers
 enforcer.controllers(controllersPath).catch(console.error)
 
 //produce fallback mock responses
-enforcer.mocks({}, true).catch(console.error)
+//enforcer.mocks({}, true).catch(console.error)
 
 //tell express to run the internal open api enforcer middleware
 app.use(enforcer.middleware())

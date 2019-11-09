@@ -50,3 +50,146 @@ exports.createSchedules = function (req, res) {
 
 
 
+// ----- Mock Store -----
+
+const classLibrary = {
+    "CS224": {
+        "year_term": "20195",
+        "curriculum_id": "10178",
+        "title_code": "002",
+        "dept_name": "C S",
+        "catalog_number": "224",
+        "catalog_suffix": null,
+        "title": "Computer Systems",
+        "full_title": "Introduction to Computer Systems.",
+        "sections": [
+            {
+                "section_number": "001",
+                "fixed_or_variable": "F",
+                "credit_hours": "3.00",
+                "minimum_credit_hours": "3.00",
+                "honors": null,
+                "credit_type": "S",
+                "section_type": "DAY",
+                "instructor_name": null,
+                "instructor_id": null
+            },
+            {
+                "section_number": "002",
+                "fixed_or_variable": "F",
+                "credit_hours": "3.00",
+                "minimum_credit_hours": "3.00",
+                "honors": null,
+                "credit_type": "S",
+                "section_type": "DAY",
+                "instructor_name": null,
+                "instructor_id": null
+            }
+        ]
+    },
+
+    "CS428": {
+        "year_term": "20195",
+        "curriculum_id": "10178",
+        "title_code": "002",
+        "dept_name": "C S",
+        "catalog_number": "224",
+        "catalog_suffix": null,
+        "title": "Computer Systems",
+        "full_title": "Introduction to Computer Systems.",
+        "sections": [
+            {
+                "section_number": "001",
+                "fixed_or_variable": "F",
+                "credit_hours": "3.00",
+                "minimum_credit_hours": "3.00",
+                "honors": null,
+                "credit_type": "S",
+                "section_type": "DAY",
+                "instructor_name": null,
+                "instructor_id": null
+            },
+            {
+                "section_number": "002",
+                "fixed_or_variable": "F",
+                "credit_hours": "3.00",
+                "minimum_credit_hours": "3.00",
+                "honors": null,
+                "credit_type": "S",
+                "section_type": "DAY",
+                "instructor_name": null,
+                "instructor_id": null
+            }
+        ]
+    },
+
+    "CS330": {
+        "year_term": "20195",
+        "curriculum_id": "10178",
+        "title_code": "002",
+        "dept_name": "C S",
+        "catalog_number": "224",
+        "catalog_suffix": null,
+        "title": "Computer Systems",
+        "full_title": "Introduction to Computer Systems.",
+        "sections": [
+            {
+                "section_number": "001",
+                "fixed_or_variable": "F",
+                "credit_hours": "3.00",
+                "minimum_credit_hours": "3.00",
+                "honors": null,
+                "credit_type": "S",
+                "section_type": "DAY",
+                "instructor_name": null,
+                "instructor_id": null
+            },
+            {
+                "section_number": "002",
+                "fixed_or_variable": "F",
+                "credit_hours": "3.00",
+                "minimum_credit_hours": "3.00",
+                "honors": null,
+                "credit_type": "S",
+                "section_type": "DAY",
+                "instructor_name": null,
+                "instructor_id": null
+            }
+        ]
+    },
+
+    "HIST101": {
+        "year_term": "20195",
+        "curriculum_id": "10178",
+        "title_code": "002",
+        "dept_name": "C S",
+        "catalog_number": "224",
+        "catalog_suffix": null,
+        "title": "Computer Systems",
+        "full_title": "Introduction to Computer Systems.",
+        "sections": [
+            {
+                "section_number": "001",
+                "fixed_or_variable": "F",
+                "credit_hours": "3.00",
+                "minimum_credit_hours": "3.00",
+                "honors": null,
+                "credit_type": "S",
+                "section_type": "DAY",
+                "instructor_name": null,
+                "instructor_id": null
+            },
+            {
+                "section_number": "002",
+                "fixed_or_variable": "F",
+                "credit_hours": "3.00",
+                "minimum_credit_hours": "3.00",
+                "honors": null,
+                "credit_type": "S",
+                "section_type": "DAY",
+                "instructor_name": null,
+                "instructor_id": null
+            }
+        ]
+    },
+}
