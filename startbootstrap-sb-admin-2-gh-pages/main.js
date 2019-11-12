@@ -60,7 +60,7 @@ function addClass() {
     var row = table.insertRow(-1);
     row.setAttribute("id", rowCount);
     var cell1 = row.insertCell(0);
-    var cell2 = row.insertCell(1);Use
+    var cell2 = row.insertCell(1);
     var cell3 = row.insertCell(2);
     var cell4 = row.insertCell(3);
 
@@ -101,7 +101,7 @@ function submitList() {
     for (let i = 1; row = table.rows[i]; i++) {
         //only need second col of each row. skip header
         classJson += "{'classId':'"+row.cells[1].innerHTML+"'},";
-    }Use
+    }
     classJson = classJson.slice(0, classJson.length-1); //chop the last comma
     classJson += "}";
     console.log("json: " + classJson);
