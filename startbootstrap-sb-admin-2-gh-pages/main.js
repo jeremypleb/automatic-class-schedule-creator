@@ -108,11 +108,33 @@ function buildList() {
     classJson = classJson.slice(0, classJson.length-1); //chop the last comma
     classJson += ", events:'"+eventsJSON+"}";
     console.log("json: " + classJson);
+
+    const Http = new XMLHttpRequest();
+    const url='http://localhost:3000/postSchedule';
+    Http.open("POST", url, true);
+    Http.setRequestHeader("Content-Type", "application/json");
+    //Http.send(JSON.stringify(classJson));
+    Http.send(JSON.stringify({ "email": "hello@user.com", "response": { "name": "Tester" } }));
+    Http.onreadystatechange = function() {
+        if (Http.readyState == XMLHttpRequest.DONE) {
+            alert(Http.responseText);
+        }
+    }
     return classJson;
 }
 
 //getsStartingList - all classes
 function getClassList(){
+    const Http = new XMLHttpRequest();
+    const url='http://localhost:3000/getClass';
+    Http.open("GET", url);
+    Http.send();
+    Http.onreadystatechange = function() {
+        if (Http.readyState == XMLHttpRequest.DONE) {
+            console.log(Http.responseText)
+        }
+    }
+
     console.log("getting list")
 }
 
