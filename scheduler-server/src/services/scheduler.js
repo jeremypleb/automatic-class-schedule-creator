@@ -1,12 +1,14 @@
 const Utility = require("./utility");
 
-module.expors = class Scheduler {
+module.exports = class Scheduler {
 
   constructor(courseIds, blockedTime, dirPath) {
     this.courseIds = courseIds;
     this.blockedTime = blockedTime;
 
     this._loadClasses(dirPath);
+
+    // console.log(this.classes);
 
     this.days = [
       'mon',
@@ -23,7 +25,7 @@ module.expors = class Scheduler {
     const utility = new Utility();
 
     const classes = this.courseIds.map((courseId) => {
-      return utility.loadJson(`${dirPath}/${courseId}/.json`);
+      return utility.loadJson(`${dirPath}/${courseId}.json`);
     });
 
     if (classes.some(c => !c)) {
@@ -121,8 +123,8 @@ module.expors = class Scheduler {
     })();
 
     const getCombination = (n) => {
-      return classSections.map((sections) => {
-        return sections[Math.floor(n / divisors[i]) % sections.length];
+      return classSections.map((sections, z) => {
+        return sections[Math.floor(n / divisors[z]) % sections.length];
       });
     }
 
@@ -135,10 +137,13 @@ module.expors = class Scheduler {
       // get a combination, e.g. [0,0,1,2,1]
       const combination = getCombination(i);
 
+      // console.log('combination', combination);
+
       // grab the indicated section for each class
-      const sectionCombination = classSections.map((sections, j) => {
-        return sections[combination[j]];
-      });
+      // const sectionCombination = classSections.map((sections, j) => {
+      //   return sections[combination[j]];
+      // });
+      const sectionCombination = combination;
 
       if (this._isValidSchedule(sectionCombination)) {
         validSchedules.push(sectionCombination);

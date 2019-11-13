@@ -45,24 +45,20 @@ app.get('/classes', function (req, res, next) {
 
 // generates schedules according to the given data and returns them
 app.post('/scheduler', function (req, res, next) {
-    // console.log(req.body);
+    console.log(req.body);
 
     const { semester, courseIds, blockedTime } = req.body;
-    const dirPath = '../../../data/20195';
+    const dirPath = `../data/${semester}`;
 
-    console.log(semester);
-    console.log(courseIds);
-    console.log(blockedTime);
-
-    res.json({ schedules: {} });
+    // res.json({ schedules: {} });
 
     // TODO we can format the validSchedules and send back the response as the client expects
-    // const scheduler = new Scheduler(courseIds, blockedTime, dirPath);
-    // const validSchedules = scheduler.generateSchedules(1000);
+    const scheduler = new Scheduler(courseIds, blockedTime, dirPath);
+    const validSchedules = scheduler.generateSchedules(1000);
 
-    // const schedulesToSend = validSchedules.splice(0, 3);
+    const schedulesToSend = validSchedules.splice(0, 3);
 
-    // res.json({ schedules: validSchedules });
+    res.json({ schedules: schedulesToSend });
 
     next();
 });

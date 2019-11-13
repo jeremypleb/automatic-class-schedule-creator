@@ -117,6 +117,7 @@ function submitList() {
     Http.onreadystatechange = function() {
         if (Http.readyState == XMLHttpRequest.DONE) {
             alert(Http.responseText);
+            console.log(JSON.parse(Http.responseText));
         }
     }
 }
