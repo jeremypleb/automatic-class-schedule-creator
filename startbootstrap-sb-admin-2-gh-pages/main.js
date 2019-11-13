@@ -8,6 +8,8 @@ var courseFullName = ""
 var calendar = null
 var groupId = 0
 var sourceObject = 1
+var CLASS_LIST = {};
+var gotSchedules;
 
 function setTerm() {
     t = document.getElementById("term");
@@ -31,10 +33,10 @@ function setSubject() {
     document.getElementById("course").disabled = false;
     document.getElementById("course").innerHTML = "<option>--Select Course--</option>"; //empty (if they change the list)
     var c = document.getElementById("course");
-    for(var i in myJson["classes"]){ //pull all of these that work
-        //match to subject
-        if(myJson["classes"][i]["department"] == sub){
-            c.add(new Option(myJson["classes"][i]["classId"], myJson["classes"][i]["classId"]));
+    
+    for(var i in CLASS_LIST["classes"]){ //pull all of these that work
+        if(CLASS_LIST["classes"][i]["department"] == sub){
+            c.add(new Option(CLASS_LIST["classes"][i]["classId"], CLASS_LIST["classes"][i]["classId"]));
         }
     }
 }
@@ -42,12 +44,11 @@ function setSubject() {
 function setCourse() {
     c = document.getElementById("course");
     course = c.options[c.selectedIndex].text;
-    //get the full name of course.
 
-    for(var i in myJson["classes"]){ //pull all of these that work
+    for(var i in CLASS_LIST["classes"]){ //pull all of these that work
         //match to subject
-        if(myJson["classes"][i]["classId"] == course){
-            courseFullName = myJson["classes"][i]["fullTitle"];
+        if(CLASS_LIST["classes"][i]["classId"] == course){
+            courseFullName = CLASS_LIST["classes"][i]["fullTitle"];
             break;
         }
     }
@@ -99,31 +100,86 @@ function dropClass(rowId) {
 }
 
 //package things up and send to backend
-function buildList() {
+function getSchedules() {
     var eventsJSON = JSON.stringify(getFormattedEvents());
-    var classJson = "{'term':'"+term +", 'classesToAdd': [";
+    var classJson = '{"term":"'+term +'", "classesToAdd": [';
     var table = document.getElementById("myTable");
     tableLength = table.rows.length;
-    console.log(tableLength);
     for (let i = 1; row = table.rows[i]; i++) {
-        classJson += "{'classId':'"+row.cells[1].innerHTML+"'},";
+        classJson += '{"classId":"'+row.cells[1].innerHTML+'"},';
     }
     classJson = classJson.slice(0, classJson.length-1); //chop the last comma
-    classJson += ", events:'"+eventsJSON+"}";
-    console.log("json: " + classJson);
+    classJson += '], "events":'+eventsJSON+'}';
 
     const Http = new XMLHttpRequest();
     const url='http://localhost:3000/postSchedule';
     Http.open("POST", url, true);
     Http.setRequestHeader("Content-Type", "application/json");
-    //Http.send(JSON.stringify(classJson));
-    Http.send(JSON.stringify({ "email": "hello@user.com", "response": { "name": "Tester" } }));
+    Http.send(classJson);
+    // Http.send(JSON.stringify({ "email": "hello@user.com", "response": { "name": "Tester" } }));
     Http.onreadystatechange = function() {
         if (Http.readyState == XMLHttpRequest.DONE) {
-            alert(Http.responseText);
+            gotSchedules = Http.responseText;
+            console.log("result: ", gotSchedules);
         }
     }
-    return classJson;
+}
+
+function changeSchedule(num){
+    //clear the schedule
+    removeClasses();
+    var exampleSchedule ={
+        "events": [
+            {
+                "eventName": "test",
+                "startTime": "07:00",
+                "endTime": "08:00",
+                "days": [
+                    "M", "T"
+                ]
+            },
+            {
+                "eventName": "test2",
+                "startTime": "07:00",
+                "endTime": "08:00",
+                "days": [
+                    "Th"
+                ]
+            }
+        ]
+    }
+    console.log(exampleSchedule);
+    var exampleSchedule2 ={
+        "events": [
+            {
+                "eventName": "test2",
+                "startTime": "07:00",
+                "endTime": "08:00",
+                "days": [
+                    "T", "F"
+                ]
+            }
+        ]
+    }
+    var exampleSchedule3 ={
+        "events": [
+            {
+                "eventName": "test3",
+                "startTime": "07:00",
+                "endTime": "08:00",
+                "days": [
+                    "M", "T", "W"
+                ]
+            }
+        ]
+    }
+    var testSchedules=[exampleSchedule, exampleSchedule2, exampleSchedule3];
+    scheduleIndex = num - 1;
+    // switch to gotSchedules once backend returns an actual schedule
+    events = testSchedules[scheduleIndex]["events"];
+    for(var event in events){
+        addEvents(events[event]["eventName"], events[event]["startTime"], events[event]["endTime"], events[event]["days"], true);
+    }
 }
 
 //getsStartingList - all classes
@@ -134,20 +190,14 @@ function getClassList(){
     Http.send();
     Http.onreadystatechange = function() {
         if (Http.readyState == XMLHttpRequest.DONE) {
-            console.log(Http.responseText)
+            CLASS_LIST = JSON.parse(Http.responseText);
+            console.log(CLASS_LIST);
         }
     }
-
-    console.log("getting list")
-}
-
-//get schedules from backend, and add to calendar.
-function getSchedule() {
-    schedules = buildList();
-    console.log(schedules);
 }
 
 var subs =['A HTG', 'ACC', 'AEROS', 'AFRIK', 'AM ST', 'ANES', 'ANTHR', 'ARAB', 'ARMEN', 'ART', 'ARTED', 'ARTHC', 'ASIAN', 'ASL', 'BIO', 'BULGN', 'C S', 'CAMBO', 'CANT', 'CE EN', 'CEBU', 'CFM', 'CH EN', 'CHEM', 'CHIN', 'CL CV', 'CLSCS', 'CMLIT', 'CMPST', 'COMD', 'COMMS', 'CPSE', 'CREOL', 'CSANM', 'DANCE', 'DANSH', 'DES', 'DESAN', 'DESGD', 'DESIL', 'DESPH', 'DIGHT', 'DUTCH', 'EC EN', 'ECE', 'ECON', 'EDLF', 'EIME', 'EL ED', 'ELANG', 'ENG T', 'ENGL', 'ENT', 'ESL', 'ESTON', 'EUROP', 'EXDM', 'EXSC', 'FHSS', 'FIN', 'FINN', 'FLANG', 'FNART', 'FREN', 'GEOG', 'GEOL', 'GERM', 'GREEK', 'GSCM', 'GWS', 'HAWAI', 'HCOLL', 'HEB', 'HINDI', 'HIST', 'HLTH', 'HMONG', 'HONRS', 'HRM', 'HUNG', 'IAS', 'ICLND', 'ICS', 'IHUM', 'INDES', 'INDON', 'IP&T', 'IS', 'IT&C', 'ITAL', 'JAPAN', 'KICHE', 'KIRIB', 'KOREA', 'LATIN', 'LATVI', 'LAW', 'LFSCI', 'LING', 'LINGC', 'LITHU', 'LT AM', 'M COM', 'MALAG', 'MALAY', 'MATH', 'MBA', 'ME EN', 'MESA', 'MFGEN', 'MFHD', 'MFT', 'MIL S', 'MKTG', 'MMBIO', 'MPA', 'MSB', 'MTHED', 'MUSIC', 'NAVAJ', 'NDFS', 'NE LG', 'NEURO', 'NORWE', 'NURS', 'PDBIO', 'PERSI', 'PETE', 'PHIL', 'PHSCS', 'PHY S', 'PLANG', 'POLI', 'POLSH', 'PORT', 'PSYCH', 'PWS', 'QUECH', 'REL A', 'REL C', 'REL E', 'ROM', 'RUSS', 'SAMOA', 'SC ED', 'SCAND', 'SFL', 'SLAT', 'SLOVK', 'SOC', 'SOC W', 'SPAN', 'STAC', 'STAT', 'STDEV', 'STRAT', 'SWAHI', 'SWED', 'SWELL', 'T ED', 'TAGAL', 'TECH', 'TEE', 'TELL', 'TES', 'TEST', 'THAI', 'TMA', 'TONGA', 'TRM', 'TURK', 'UNIV', 'URDU', 'VIET', 'WELSH', 'WRTG']
+//testing before pulled something
 var myJson = {
     "classes": [
         {
@@ -176,7 +226,7 @@ var myJson = {
             "department": "MATH",
             "courseNumber": "102",
             "title": "Quantitative Reasoning",
-            "fullTitle": "Quantitative Reasoning"
+            "fullTitle": "QuantitativeUse Reasoning"
         },
         {
             "classId": "MATH110",
@@ -236,7 +286,58 @@ var myJson = {
     }
 }
 
-// Calendar Functions. Use addEvents() to add event to calendar.
+// Calendar Functions. See addEvents() to add event to calendar. See getFormattedEvents() to get events from calendar.
+
+
+document.addEventListener('DOMContentLoaded', function () {
+  var calendarEl = document.getElementById('calendar');
+
+  calendar = new FullCalendar.Calendar(calendarEl, {
+    plugins: ['dayGrid', 'bootstrap', 'interaction', 'timeGrid'],
+    themeSystem: 'bootstrap',
+    selectable: true,
+    editable: true,
+    selectOverlap: false,
+    eventOverlap: false,
+    hiddenDays: [0],
+    minTime: "07:00:00",
+    maxTime: "21:00:00",
+    titleFormat: { month: 'short' },
+    defaultView: 'timeGridWeek',
+    height: 'auto',
+    allDaySlot: false,
+    header: false,
+    views: {
+      week: {
+        columnHeaderFormat: { weekday: 'long' }
+      }
+    },
+    eventRender: function(info) {
+      info.el.querySelector('.fc-title').innerHTML += "<br><i class='far fa-trash-alt pull-right' id='Delete'></i>";
+      if(info.event.source.id == 2)
+      {
+        info.el.querySelector('.fc-title').innerHTML += "<i class='fa fa-pencil pull-right' id='Edit'></i>";
+      }
+    },
+    select: function(info) {
+        editEvent(info);
+    },
+    eventClick: function(info) {
+      if (info.jsEvent.target.id === 'Delete') {
+          removeGroup(info.event.groupId);
+      }
+      if (info.jsEvent.target.id === 'Edit') {
+          editEvent(info.event);
+      }
+
+    }
+  });
+
+  calendar.render();
+  getClassList();
+});
+
+
 
 Date.prototype.getDaysOfCurrentWeek = function(start)
    {
@@ -256,7 +357,6 @@ Date.prototype.getDaysOfCurrentWeek = function(start)
        tmp.setDate(today.getDate() + i);
 //       daysOfWeek[days[i]] = tmp.getFullYear()+'-'+(tmp.getMonth()+1)+'-'+tmp.getDate();
        daysOfWeek[days[i]] = tmp.toISOString().substr(0,10);
-       console.log(tmp.toISOString().substr(0,10));
    }
 
    return daysOfWeek;
@@ -270,15 +370,6 @@ function getWeekday(index)
 
 var daysToDate = new Date().getDaysOfCurrentWeek(); // gets array like ('nameOfDay' => 0000-00-00)
 
-//Functions for calendar
-function openForm() {
-  document.getElementById("myForm").style.display = "block";
-}
-
-function closeForm() {
-  document.getElementById("myForm").style.display = "none";
-}
-
 //Used when submit button from DOM is clicked. This gets the data from the form and passes it to addEvents()
 
 function putEvents() {
@@ -289,34 +380,7 @@ function putEvents() {
   document.querySelectorAll('input[type="checkbox"]:checked').forEach(function(element) {
     days.push(element.value);
 } );
-  addEvents(eventName, start, end, days)
-}
-
-function addEvents(eventName, start, end, days) {
-  console.log(eventName);
-  console.log(start);
-  console.log(end);
-  console.log(days);
-  groupId += 1;
-//  var eventName = document.getElementById("eventName").value;
-//  var start = document.getElementById("start_time").value;
-//  var end = document.getElementById("end_time").value;
-//  console.log(document.querySelectorAll('input[type="checkbox"]:checked'));
-  days.forEach(function(element) {
-    console.log(element);
-    console.log(daysToDate[element]);
-//    console.log(document.getElementById('calendar'));
-    calendar.addEvent( {
-      title: eventName,
-      start: daysToDate[element]+'T'+ start + ':00', // here we are setting needed date from array 'days' by day's name which we got from input
-      end: daysToDate[element]+'T'+ end + ':00',     // here's the same
-      groupId: groupId
-    },);
-  }
-);
-
-  console.log(getFormattedEvents());
-//  document.getElementById("myForm").reset();
+  addEvents(eventName, start, end, days, false);
 }
 
 function checkBox() {
@@ -327,7 +391,109 @@ function checkBox() {
   if (checkedOne && document.getElementById("eventName").value != "" && document.getElementById("start_time").value != "" && document.getElementById("end_time").value != "") {
     document.getElementById('eventSubmit').disabled = false;
   }
+  if (document.getElementById("start_time").value >= document.getElementById("end_time").value) {
+      alert("The end time must be after the start time");
+  }
 }
+
+//Removes just the classes. This is important for multiple schedules, but keeping the user's events on the calendar.
+
+function removeClasses() {
+    console.log(calendar.getEventSources());
+    calendar.getEventSources().forEach( function(element) {
+        if(element.id == 1){
+            element.remove();
+        }
+    });
+}
+
+function removeGroup(groupId) {
+    calendar.getEvents().forEach( function(element) {
+    if(element.groupId == groupId)
+    {
+        element.remove();
+    }
+    });
+}
+
+function editEvent(changeEvent) {
+    startTime = ('0'+changeEvent.start.getHours()).slice(-2) + ':' + ('0'+changeEvent.start.getMinutes()).slice(-2);
+    endTime = ('0'+changeEvent.end.getHours()).slice(-2) + ':' + ('0'+changeEvent.end.getMinutes()).slice(-2);
+    if (changeEvent.title){
+        document.getElementById("eventName").value = changeEvent.title;
+    }
+    document.getElementById("start_time").value = startTime;
+    document.getElementById("end_time").value = endTime;
+    if(changeEvent.groupId){
+        removeGroup(changeEvent.groupId);
+    }
+    document.getElementById("addButton").click();
+}
+
+function resetModal() {
+    document.getElementById("eventName").value = "";
+    document.getElementById("start_time").value = "";
+    document.getElementById("end_time").value = "";
+    var checks = document.querySelectorAll('#weekDays input[type="checkbox"]');
+    for(var i =0; i< checks.length;i++){
+        var check = checks[i];
+        if(!check.disabled){
+            check.checked = false;
+        }
+    }
+}
+
+//Functions to access calendar functionality. If there is something you need to do other than this please tell me.
+//Anything else could break how the calendar is working.
+
+
+//Function to add Events to the calendar.
+//eventName = string for title of Event.
+//start = start time, formatted as XX:XX based on 24 hour clock
+//end = end time, formatted as XX:XX based on 24 clock
+//days = array of days of event, formatted as ["Sunday", "M", "T", "W", "Th", "F", "S"]
+//classes = boolean, whether or not this is class or a different event. Defualts to true. All other calls will set this to false.
+
+function addEvents(eventName, start, end, days, classes=true) {
+  console.log(eventName);
+  console.log(start);
+  console.log(end);
+  console.log(days);
+  groupId += 1;
+
+  source = [];
+  i = 0;
+
+  days.forEach(function(element) {
+    var newEvent = new Object();
+    newEvent.title = eventName;
+    newEvent.start = daysToDate[element]+'T'+ start + ':00';
+    newEvent.end = daysToDate[element]+'T'+ end + ':00';
+    newEvent.groupId = groupId;
+    source[i] = newEvent;
+    i++;
+
+    });
+
+    source.overlap = false;
+
+    if(classes) {
+        source.id = 1;
+        source.editable = false;
+    }
+    else {
+        source.id = 2;
+    }
+
+    calendar.addEventSource(source);
+    resetModal();
+//  console.log(getFormattedEvents());
+//  document.getElementById("myForm").reset();
+}
+
+//Function to get the Events from the calendar added by User.
+//Will return a JSON object that is organized by day.
+//Each day has an array of objects that have start and end times
 
 function getFormattedEvents() {
     events = {
@@ -339,10 +505,8 @@ function getFormattedEvents() {
         "S":[]
     };
     calendar.getEvents().forEach( function(element) {
-        var date = new Date(element.start.getFullYear(), element.start.getMonth(), element.start.getDate());
         var tmp = { "start":(element.start.getHours() + ":" + element.start.getMinutes()), "end":(element.end.getHours() + ":" + element.end.getMinutes())};
-        index = getWeekday(date.getDay());
-        events[getWeekday(date.getDay())].push(tmp);
+        events[getWeekday(element.start.getDay())].push(tmp);
     });
     console.log(events);
     return events;

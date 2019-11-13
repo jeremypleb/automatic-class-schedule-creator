@@ -25,7 +25,7 @@
   <link href='packages/daygrid/main.css' rel='stylesheet' />
   <link href='packages/timegrid/main.css' rel='stylesheet' />
   <link href='packages/bootstrap/main.css' rel='stylesheet' />
-  <link href='style.css' rel='stylesheet' />
+  <!-- <link href='style.css' rel='stylesheet' /> -->
 
   <script src='packages/core/main.js'></script>
   <script src='packages/interaction/main.js'></script>
@@ -33,79 +33,7 @@
   <script src='packages/timegrid/main.js'></script>
   <script src='packages/bootstrap/main.js'></script>
   <script src='main.js'></script>
-  <script src="https://kit.fontawesome.com/a65d4144cf.js" crossorigin="anonymous"></script>
 
-
-  <script>
-
-    document.addEventListener('DOMContentLoaded', function () {
-      var calendarEl = document.getElementById('calendar');
-
-      calendar = new FullCalendar.Calendar(calendarEl, {
-        plugins: ['dayGrid', 'bootstrap', 'interaction', 'timeGrid'],
-        themeSystem: 'bootstrap',
-        selectable: true,
-        editable: true,
-        selectOverlap: false,
-        eventOverlap: false,
-        hiddenDays: [0],
-        minTime: "07:00:00",
-        maxTime: "21:00:00",
-        titleFormat: { month: 'short' },
-        defaultView: 'timeGridWeek',
-        height: 'auto',
-        allDaySlot: false,
-        header: {
-          left: '',
-          center: 'title',
-          right: ''
-        },
-        views: {
-          week: {
-            columnHeaderFormat: { weekday: 'long' }
-          }
-        },
-        eventRender: function(info) {
-          console.log(info.el.innerHTML);
-          info.el.querySelector('.fc-title').innerHTML += "<br><i class='far fa-trash-alt pull-right' id='Delete'></i><i class='fa fa-pencil pull-right' id='Edit'></i>";
-          console.log(info.el.innerHTML);
-        },
-        select: function(info) {
-          var eventName = prompt('Enter the name of the event');
-          calendar.addEvent({
-            title: eventName,
-            start: info.startStr,
-            end: info.endStr,
-            groupId: groupId += 1
-          });
-        },
-        eventClick: function(info) {
-//          console.log(info.event.id);
-          if (info.jsEvent.target.id === 'Delete') {
-//            alert("click here"); // Maybe show a modal dialog asking the user if he wants to delete the event.
-            calendar.getEvents().forEach( function(element) {
-              if(element.groupId == info.event.groupId)
-              {
-                element.remove();
-              }
-//              console.log(element);
-            });
-        }
-        if (info.jsEvent.target.id === 'Edit') {
-//            alert("time to edit"); // Maybe show a modal dialog asking the user if he wants to delete the event.
-            var eventName = prompt('Enter the new name of the event');
-            info.event.setProp("title", eventName);
-        }
-        var test = new Date(info.event.start.getFullYear(), info.event.start.getMonth(), info.event.start.getDate());
-        console.log(test.getDay());
-        }
-      });
-
-      calendar.render();
-      getClassList();
-    });
-
-  </script>
 </head>
 
 <body id="page-top">
@@ -153,8 +81,15 @@
           <!-- Page Heading -->
           <div class="d-sm-flex align-items-center justify-content-between mb-4">
             <!--        <h1 class="h3 mb-0 text-gray-800">Dashboard</h1> -->
-            <button type="button" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" data-toggle="modal" data-target="#ModalLoginForm"><i
+            <button type="button" id="addButton" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" data-toggle="modal" data-target="#ModalLoginForm"><i
                 class="fas fa-plus fa-sm text-white-50"></i> Add Event</button>
+
+                <div id="scheduleButtons" class="d--flex align-items-end">
+                  <!--        <h1 class="h3 mb-0 text-gray-800">Dashboard</h1> -->
+                  <button type="button" id="1" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" onclick="changeSchedule(this.id)">Schedule 1</button>
+                  <button type="button" id="2" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" onclick="changeSchedule(this.id)">Schedule 2</button>
+                  <button type="button" id="3" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" onclick="changeSchedule(this.id)">Schedule 3</button>
+                </div>
           </div>
 
           <!-- Modal HTML Markup -->
@@ -167,14 +102,16 @@
                       <div class="modal-body">
                         <form class="form-container">
                               <label for="event"><b>Name of Event</b></label>
-                              <input class="form-control" onchange="checkBox()" id="eventName" type="text" placeholder="Enter Name of Event" name="event" required>
+                              <input class="form-control" onchange="checkBox()" id="eventName" type="text" placeholder="Enter Name of Event" name="event" id="eventName" required>
                               <br>
-                              <input class="checkbox-inline" type="checkbox" onchange="checkBox()" id="day" name="monday" value="M"> Monday </input>
-                              <input class="checkbox-inline" type="checkbox" onchange="checkBox()" id="day" name="tuesday" value="T"> Tuesday </input>
-                              <input class="checkbox-inline" type="checkbox" onchange="checkBox()" id="day" name="wednesday" value="W"> Wednesday </input>
-                              <input class="checkbox-inline" type="checkbox" onchange="checkBox()" id="day" name="thursday" value="Th"> Thursday </input>
-                              <input class="checkbox-inline" type="checkbox" onchange="checkBox()" id="day" name="friday" value="F"> Friday </input>
-                              <input class="checkbox-inline" type="checkbox" onchange="checkBox()" id="day" name="saturday" value="S"> Saturday </input>
+                              <div id="weekDays">
+                              <input class="checkbox-inline" type="checkbox" onchange="checkBox()" id="m" name="monday" value="M"> Monday </input>
+                              <input class="checkbox-inline" type="checkbox" onchange="checkBox()" id="t" name="tuesday" value="T"> Tuesday </input>
+                              <input class="checkbox-inline" type="checkbox" onchange="checkBox()" id="w" name="wednesday" value="W"> Wednesday </input>
+                              <input class="checkbox-inline" type="checkbox" onchange="checkBox()" id="th" name="thursday" value="Th"> Thursday </input>
+                              <input class="checkbox-inline" type="checkbox" onchange="checkBox()" id="f" name="friday" value="F"> Friday </input>
+                              <input class="checkbox-inline" type="checkbox" onchange="checkBox()" id="s" name="saturday" value="S"> Saturday </input>
+                              </div>
                               <br>
                               <br>
                               <label for="start_time"><b>Start Time (HH:MM AM/PM)</b></label>
