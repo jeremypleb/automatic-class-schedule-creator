@@ -111,7 +111,7 @@ function submitList() {
     Http.open("POST", url, true);
     Http.setRequestHeader("Content-Type", "application/json");
     //Http.send(JSON.stringify(classJson));
-    Http.send(JSON.stringify({ "email": "hello@user.com", "response": { "name": "Tester" } }));
+    Http.send(JSON.stringify(getFormattedEvents()));
     Http.onreadystatechange = function() {
         if (Http.readyState == XMLHttpRequest.DONE) {
             alert(Http.responseText);
