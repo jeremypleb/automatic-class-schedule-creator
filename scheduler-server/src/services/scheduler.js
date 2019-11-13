@@ -1,6 +1,6 @@
-import { Utility } from "./utility";
+const Utility = require("./utility");
 
-export class Scheduler {
+module.expors = class Scheduler {
 
   constructor(courseIds, blockedTime, dirPath) {
     this.courseIds = courseIds;
@@ -20,7 +20,7 @@ export class Scheduler {
   }
 
   _loadClasses(dirPath) {
-    const utility = Utility();
+    const utility = new Utility();
 
     const classes = this.courseIds.map((courseId) => {
       return utility.loadJson(`${dirPath}/${courseId}/.json`);

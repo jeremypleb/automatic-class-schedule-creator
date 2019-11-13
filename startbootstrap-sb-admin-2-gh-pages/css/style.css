@@ -1,0 +1,11 @@
+.fc-today {
+  background-color: inherit !important;
+}
+
+.card {
+  border: none !important;
+}
+
+.calendar-card {
+  padding: 10px;
+}

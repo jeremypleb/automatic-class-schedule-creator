@@ -1,4 +1,6 @@
-export class Utility {
+const fs = require("fs");
+
+module.exports = class Utility {
   
   constructor() {}
 

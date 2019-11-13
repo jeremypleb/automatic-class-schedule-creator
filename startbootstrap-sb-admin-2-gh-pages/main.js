@@ -94,40 +94,41 @@ function dropClass(rowId) {
 
 //package things up and send to backend
 function submitList() {
-    var classJson = "{'classesToAdd': [";
-    var table = document.getElementById("myTable");
-    tableLength = table.rows.length;
-    console.log(tableLength);
-    for (let i = 1; row = table.rows[i]; i++) {
-        //only need second col of each row. skip header
-        classJson += "{'classId':'"+row.cells[1].innerHTML+"'},";
+    const semester = '20195';
+
+    const courseIds = Array.from(document.getElementById("myTable").rows).splice(1).map((row) => {
+        return row.cells[1].innerText;
+    });
+
+    const blockedTime = getFormattedEvents();
+
+    const classJson = {
+        semester: semester,
+        courseIds: courseIds,
+        blockedTime: blockedTime
     }
-    classJson = classJson.slice(0, classJson.length-1); //chop the last comma
-    classJson += "}";
-    console.log("json: " + classJson);
 
     const Http = new XMLHttpRequest();
-    const url='http://localhost:3000/postSchedule';
+    const url='http://localhost:3000/scheduler';
     Http.open("POST", url, true);
     Http.setRequestHeader("Content-Type", "application/json");
-    //Http.send(JSON.stringify(classJson));
-    Http.send(JSON.stringify({ "email": "hello@user.com", "response": { "name": "Tester" } }));
+    Http.send(JSON.stringify(classJson));
+    //Http.send(JSON.stringify({ "email": "hello@user.com", "response": { "name": "Tester" } }));
     Http.onreadystatechange = function() {
         if (Http.readyState == XMLHttpRequest.DONE) {
             alert(Http.responseText);
         }
     }
-    return classJson;
 }
 
 function getClassList(){
     const Http = new XMLHttpRequest();
-    const url='http://localhost:3000/getClass';
+    const url='http://localhost:3000/classes';
     Http.open("GET", url);
     Http.send();
     Http.onreadystatechange = function() {
         if (Http.readyState == XMLHttpRequest.DONE) {
-            console.log(Http.responseText)
+            console.log(Http.responseText);
         }
     }
 
@@ -434,23 +435,46 @@ function addEvents(eventName, start, end, days, classes=true) {
 //  document.getElementById("myForm").reset();
 }
 
+function formatTime(date) {
+    const hours = ("0" + date.getHours()).slice(-2);
+    const minutes = ("0" + date.getMinutes()).slice(-2);
+
+    return hours + minutes;
+}
+
 //Function to get the Events from the calendar added by User.
 //Will return a JSON object that is organized by day.
 //Each day has an array of objects that have start and end times
 
 function getFormattedEvents() {
-    events = {
-        "M":[],
-        "T":[],
-        "W":[],
-        "Th":[],
-        "F":[],
-        "S":[]
+    const conversion = {
+        "M": "mon",
+        "T": "tue",
+        "W": "wed",
+        "Th": "thu",
+        "F": "fri",
+        "S": "sat",
+        "Sunday": "sun"
     };
-    calendar.getEvents().forEach( function(element) {
-        var tmp = { "start":(element.start.getHours() + ":" + element.start.getMinutes()), "end":(element.end.getHours() + ":" + element.end.getMinutes())};
-        events[getWeekday(element.start.getDay())].push(tmp);
+
+    let events = {
+      mon: [],
+      tue: [],
+      wed: [],
+      thu: [],
+      fri: [],
+      sat: [],
+      sun: []
+    };
+
+    calendar.getEvents().forEach((event) => {
+        let formattedTimeBlock = {
+            start: formatTime(event.start),
+            end: formatTime(event.end)
+        }
+
+        events[conversion[getWeekday(event.start.getDay())]].push(formattedTimeBlock);
     });
-    console.log(events);
+
     return events;
 }
