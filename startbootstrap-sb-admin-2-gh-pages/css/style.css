@@ -9,3 +9,28 @@
 .calendar-card {
   padding: 10px;
 }
+
+.toolbar-title {
+  font-weight: lighter;
+  font-size: 1.8rem;
+  margin-bottom: 0;
+}
+
+.class-list {
+  padding-left: 14px;
+  padding-right: 14px;
+}
+
+.add-button {
+  margin-top: 23px;
+  width: 100%;
+  margin-left: 0 !important;
+}
+
+.dataTable th, .dataTable td {
+  border-bottom-width: 1px !important;
+}
+
+.hover:hover {
+  cursor: pointer;
+}

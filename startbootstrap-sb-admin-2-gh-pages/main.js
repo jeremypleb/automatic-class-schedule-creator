@@ -1,4 +1,4 @@
-// Need to know formats of different things is next step. everything else looks good!
+//TODO linking back and front, displaying multiple schedules in tabs
 var rowCount = 0
 var term = ""
 var sub = ""
@@ -8,15 +8,18 @@ var courseFullName = ""
 var calendar = null
 var groupId = 0
 var sourceObject = 1
+var CLASS_LIST = {};
+var gotSchedules;
 
 function setTerm() {
     t = document.getElementById("term");
     term = t.options[t.selectedIndex].text;
-    //maybe use this for something?
 
     s = document.getElementById("sub");
     s.disabled = false;
-    s.innerHTML = "<option>--Select Course--</option>"; //empty (if they change the list)
+    s.innerHTML = "<option hidden disabled selected value>Select Subject</option>"; //empty (if they change the list)
+    document.getElementById("add").disabled = true;
+    document.getElementById("course").innerHTML =  "<option hidden disabled selected value>Select Course</option>"; //empty (if they change the list)
 
     var list = document.getElementById("sub");
     for (var i in subs) {
@@ -28,26 +31,27 @@ function setSubject() {
     s = document.getElementById("sub");
     sub = s.options[s.selectedIndex].text;
     // update courses of subject
+    document.getElementById("add").disabled = true;
     document.getElementById("course").disabled = false;
-    document.getElementById("course").innerHTML = "<option>--Select Course--</option>"; //empty (if they change the list)
+    document.getElementById("course").innerHTML = "<option hidden disabled selected value>Select Course</option>"; //empty (if they change the list)
     var c = document.getElementById("course");
-    for(var i in myJson["classes"]){ //pull all of these that work
-        //match to subject
-        if(myJson["classes"][i]["department"] == sub){
-            c.add(new Option(myJson["classes"][i]["classId"], myJson["classes"][i]["classId"]));
+    
+    for(var i in CLASS_LIST["classes"]){ //pull all of these that work
+        if(CLASS_LIST["classes"][i]["department"] == sub){
+            c.add(new Option(CLASS_LIST["classes"][i]["classId"], CLASS_LIST["classes"][i]["classId"]));
         }
     }
 }
 
 function setCourse() {
+    document.getElementById("add").disabled = false;
     c = document.getElementById("course");
     course = c.options[c.selectedIndex].text;
-    //get the full name of course.
 
-    for(var i in myJson["classes"]){ //pull all of these that work
+    for(var i in CLASS_LIST["classes"]){ //pull all of these that work
         //match to subject
-        if(myJson["classes"][i]["classId"] == course){
-            courseFullName = myJson["classes"][i]["fullTitle"];
+        if(CLASS_LIST["classes"][i]["classId"] == course){
+            courseFullName = CLASS_LIST["classes"][i]["fullTitle"];
             break;
         }
     }
@@ -55,10 +59,15 @@ function setCourse() {
 
 //if already in there, dont add.
 function addClass() {
+    // lock term
+    document.getElementById("term").disabled = true;
+    document.getElementById("getSchedulesButton").disabled = false;
+
+    if (classAlreadyExists()) { return; }
+
     var table = document.getElementById("myTable");
-    if(classAlreadyExists()){return;}
     var row = table.insertRow(-1);
-    row.setAttribute("id", rowCount);
+    row.setAttribute("id", `class${rowCount}`);
     var cell1 = row.insertCell(0);
     var cell2 = row.insertCell(1);
     var cell3 = row.insertCell(2);
@@ -70,7 +79,8 @@ function addClass() {
     cell1.innerHTML = s.options[s.selectedIndex].text;
     cell2.innerHTML = c.options[c.selectedIndex].text;
     cell3.innerHTML = courseFullName;
-    cell4.innerHTML = '<i class="far fa-trash-alt" onclick="dropClass('+rowCount+');"></i>';
+    cell4.innerHTML = '<i class="far fa-trash-alt hover" onclick="dropClass(\'class'+rowCount+'\')"></i>';
+    cell4.style.textAlign = "center";
     rowCount++;
 }
 
@@ -90,10 +100,19 @@ function classAlreadyExists(){
 function dropClass(rowId) {
     var row = document.getElementById(rowId);
     row.parentElement.removeChild(row);
+
+    rowCount--;
+
+    // if all gone unlock the term
+    if (rowCount == 0) {
+        t = document.getElementById("term");
+        t.disabled = false;
+        document.getElementById("getSchedulesButton").disabled = true;
+    }
 }
 
 //package things up and send to backend
-function submitList() {
+function getSchedules() {
     const semester = '20195';
 
     const courseIds = Array.from(document.getElementById("myTable").rows).splice(1).map((row) => {
@@ -122,6 +141,64 @@ function submitList() {
     }
 }
 
+function changeSchedule(num){
+    //clear the schedule
+    removeClasses();
+    var exampleSchedule ={
+        "events": [
+            {
+                "eventName": "test",
+                "startTime": "07:00",
+                "endTime": "08:00",
+                "days": [
+                    "M", "T"
+                ]
+            },
+            {
+                "eventName": "test2",
+                "startTime": "07:00",
+                "endTime": "08:00",
+                "days": [
+                    "Th"
+                ]
+            }
+        ]
+    }
+    console.log(exampleSchedule);
+    var exampleSchedule2 ={
+        "events": [
+            {
+                "eventName": "test2",
+                "startTime": "07:00",
+                "endTime": "08:00",
+                "days": [
+                    "T", "F"
+                ]
+            }
+        ]
+    }
+    var exampleSchedule3 ={
+        "events": [
+            {
+                "eventName": "test3",
+                "startTime": "07:00",
+                "endTime": "08:00",
+                "days": [
+                    "M", "T", "W"
+                ]
+            }
+        ]
+    }
+    var testSchedules=[exampleSchedule, exampleSchedule2, exampleSchedule3];
+    scheduleIndex = num - 1;
+    // switch to gotSchedules once backend returns an actual schedule
+    events = testSchedules[scheduleIndex]["events"];
+    for(var event in events){
+        addEvents(events[event]["eventName"], events[event]["startTime"], events[event]["endTime"], events[event]["days"], true);
+    }
+}
+
+//getsStartingList - all classes
 function getClassList(){
     const Http = new XMLHttpRequest();
     const url='http://localhost:3000/classes';
@@ -129,14 +206,14 @@ function getClassList(){
     Http.send();
     Http.onreadystatechange = function() {
         if (Http.readyState == XMLHttpRequest.DONE) {
-            console.log(Http.responseText);
+            CLASS_LIST = JSON.parse(Http.responseText);
+            console.log(CLASS_LIST);
         }
     }
-
-    console.log("getting list")
 }
 
 var subs =['A HTG', 'ACC', 'AEROS', 'AFRIK', 'AM ST', 'ANES', 'ANTHR', 'ARAB', 'ARMEN', 'ART', 'ARTED', 'ARTHC', 'ASIAN', 'ASL', 'BIO', 'BULGN', 'C S', 'CAMBO', 'CANT', 'CE EN', 'CEBU', 'CFM', 'CH EN', 'CHEM', 'CHIN', 'CL CV', 'CLSCS', 'CMLIT', 'CMPST', 'COMD', 'COMMS', 'CPSE', 'CREOL', 'CSANM', 'DANCE', 'DANSH', 'DES', 'DESAN', 'DESGD', 'DESIL', 'DESPH', 'DIGHT', 'DUTCH', 'EC EN', 'ECE', 'ECON', 'EDLF', 'EIME', 'EL ED', 'ELANG', 'ENG T', 'ENGL', 'ENT', 'ESL', 'ESTON', 'EUROP', 'EXDM', 'EXSC', 'FHSS', 'FIN', 'FINN', 'FLANG', 'FNART', 'FREN', 'GEOG', 'GEOL', 'GERM', 'GREEK', 'GSCM', 'GWS', 'HAWAI', 'HCOLL', 'HEB', 'HINDI', 'HIST', 'HLTH', 'HMONG', 'HONRS', 'HRM', 'HUNG', 'IAS', 'ICLND', 'ICS', 'IHUM', 'INDES', 'INDON', 'IP&T', 'IS', 'IT&C', 'ITAL', 'JAPAN', 'KICHE', 'KIRIB', 'KOREA', 'LATIN', 'LATVI', 'LAW', 'LFSCI', 'LING', 'LINGC', 'LITHU', 'LT AM', 'M COM', 'MALAG', 'MALAY', 'MATH', 'MBA', 'ME EN', 'MESA', 'MFGEN', 'MFHD', 'MFT', 'MIL S', 'MKTG', 'MMBIO', 'MPA', 'MSB', 'MTHED', 'MUSIC', 'NAVAJ', 'NDFS', 'NE LG', 'NEURO', 'NORWE', 'NURS', 'PDBIO', 'PERSI', 'PETE', 'PHIL', 'PHSCS', 'PHY S', 'PLANG', 'POLI', 'POLSH', 'PORT', 'PSYCH', 'PWS', 'QUECH', 'REL A', 'REL C', 'REL E', 'ROM', 'RUSS', 'SAMOA', 'SC ED', 'SCAND', 'SFL', 'SLAT', 'SLOVK', 'SOC', 'SOC W', 'SPAN', 'STAC', 'STAT', 'STDEV', 'STRAT', 'SWAHI', 'SWED', 'SWELL', 'T ED', 'TAGAL', 'TECH', 'TEE', 'TELL', 'TES', 'TEST', 'THAI', 'TMA', 'TONGA', 'TRM', 'TURK', 'UNIV', 'URDU', 'VIET', 'WELSH', 'WRTG']
+//testing before pulled something
 var myJson = {
     "classes": [
         {
@@ -224,7 +301,6 @@ var myJson = {
         ]
     }
 }
-
 
 // Calendar Functions. See addEvents() to add event to calendar. See getFormattedEvents() to get events from calendar.
 
@@ -368,11 +444,6 @@ function editEvent(changeEvent) {
         removeGroup(changeEvent.groupId);
     }
     document.getElementById("addButton").click();
-}
-
-function changeSchedule(schedule) {
-    removeClasses();
-    alert("Changing the schedule to " + schedule);
 }
 
 function resetModal() {
