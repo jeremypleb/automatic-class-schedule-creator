@@ -116,7 +116,6 @@ function getSchedules() {
     Http.open("POST", url, true);
     Http.setRequestHeader("Content-Type", "application/json");
     Http.send(classJson);
-    // Http.send(JSON.stringify({ "email": "hello@user.com", "response": { "name": "Tester" } }));
     Http.onreadystatechange = function() {
         if (Http.readyState == XMLHttpRequest.DONE) {
             gotSchedules = Http.responseText;
