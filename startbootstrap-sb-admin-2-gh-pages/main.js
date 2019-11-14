@@ -1,4 +1,3 @@
-//TODO linking back and front, displaying multiple schedules in tabs
 var rowCount = 0
 var term = ""
 var sub = ""
@@ -10,6 +9,8 @@ var groupId = 0
 var sourceObject = 1
 var CLASS_LIST = {};
 var gotSchedules;
+var schedules = [];
+var allEvents = [];
 
 function setTerm() {
     t = document.getElementById("term");
@@ -111,6 +112,13 @@ function dropClass(rowId) {
     }
 }
 
+function addColon(time) {
+    const hours = time.slice(0,2);
+    const minutes = time.slice(2);
+
+    return `${hours}:${minutes}`;
+}
+
 //package things up and send to backend
 function getSchedules() {
     const semester = '20195';
@@ -135,67 +143,119 @@ function getSchedules() {
     //Http.send(JSON.stringify({ "email": "hello@user.com", "response": { "name": "Tester" } }));
     Http.onreadystatechange = function() {
         if (Http.readyState == XMLHttpRequest.DONE) {
-            alert(Http.responseText);
-            console.log(JSON.parse(Http.responseText));
+            schedules = JSON.parse(Http.responseText).schedules;  
+            console.log(schedules);
+
+            const transition = {
+                "mon": "M",
+                "tue": "T",
+                "wed": "W",
+                "thu": "Th",
+                "fri": "F",
+                "sat": "s",
+                "sun": "Sunday"
+            }
+
+            allEvents = schedules.map((schedule) => {
+                let scheduleEvents = [];
+
+                schedule.forEach((section) => {
+                    const eventName = (section.dept_name + section.catalog_number);
+                    
+                      section.times.forEach((time) => {
+                            let days = [];
+
+                            Object.keys(transition).forEach((day) => {
+                                    if (!!time[day]) {
+                                        days.push(transition[day]);
+                                    }
+                            });
+
+                            const startTime = addColon(time.begin_time);
+                            const endTime = addColon(time.end_time);
+
+                            const newEvent = {
+                                eventName: eventName,
+                                startTime: startTime,
+                                endTime: endTime,
+                                days: days
+                            }
+
+                            scheduleEvents.push(newEvent);
+                    });
+                });
+
+                return scheduleEvents;
+            });
+
+            changeSchedule(1);
         }
     }
 }
 
-function changeSchedule(num){
-    //clear the schedule
+function changeSchedule(index) {
     removeClasses();
-    var exampleSchedule ={
-        "events": [
-            {
-                "eventName": "test",
-                "startTime": "07:00",
-                "endTime": "08:00",
-                "days": [
-                    "M", "T"
-                ]
-            },
-            {
-                "eventName": "test2",
-                "startTime": "07:00",
-                "endTime": "08:00",
-                "days": [
-                    "Th"
-                ]
-            }
-        ]
-    }
-    console.log(exampleSchedule);
-    var exampleSchedule2 ={
-        "events": [
-            {
-                "eventName": "test2",
-                "startTime": "07:00",
-                "endTime": "08:00",
-                "days": [
-                    "T", "F"
-                ]
-            }
-        ]
-    }
-    var exampleSchedule3 ={
-        "events": [
-            {
-                "eventName": "test3",
-                "startTime": "07:00",
-                "endTime": "08:00",
-                "days": [
-                    "M", "T", "W"
-                ]
-            }
-        ]
-    }
-    var testSchedules=[exampleSchedule, exampleSchedule2, exampleSchedule3];
-    scheduleIndex = num - 1;
-    // switch to gotSchedules once backend returns an actual schedule
-    events = testSchedules[scheduleIndex]["events"];
-    for(var event in events){
-        addEvents(events[event]["eventName"], events[event]["startTime"], events[event]["endTime"], events[event]["days"], true);
-    }
+
+    const events = allEvents[index - 1];
+
+    events.forEach((event) => {
+        addEvents(event["eventName"], event["startTime"], event["endTime"], event["days"], true);
+    });
+
+    //clear the schedule
+    // removeClasses();
+    // var exampleSchedule ={
+    //     "events": [
+    //         {
+    //             "eventName": "test",
+    //             "startTime": "07:00",
+    //             "endTime": "08:00",
+    //             "days": [
+    //                 "M", "T"
+    //             ]
+    //         },
+    //         {
+    //             "eventName": "test2",
+    //             "startTime": "07:00",
+    //             "endTime": "08:00",
+    //             "days": [
+    //                 "Th"
+    //             ]
+    //         }
+    //     ]
+    // }
+    // console.log(exampleSchedule);
+    // var exampleSchedule2 ={
+    //     "events": [
+    //         {
+    //             "eventName": "test2",
+    //             "startTime": "07:00",
+    //             "endTime": "08:00",
+    //             "days": [
+    //                 "T", "F"
+    //             ]
+    //         }
+    //     ]
+    // }
+    // var exampleSchedule3 ={
+    //     "events": [
+    //         {
+    //             "eventName": "test3",
+    //             "startTime": "07:00",
+    //             "endTime": "08:00",
+    //             "days": [
+    //                 "M", "T", "W"
+    //             ]
+    //         }
+    //     ]
+    // }
+    // var testSchedules=[exampleSchedule, exampleSchedule2, exampleSchedule3];
+    // scheduleIndex = num - 1;
+    // // switch to gotSchedules once backend returns an actual schedule
+    // events = testSchedules[scheduleIndex]["events"];
+    // for(var event in events){
+    //     addEvents(events[event]["eventName"], events[event]["startTime"], events[event]["endTime"], events[event]["days"], true);
+    // }
 }
 
 //getsStartingList - all classes
@@ -355,25 +415,27 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 
-Date.prototype.getDaysOfCurrentWeek = function(start)
-   {
-       // Array of all days of week
-       var days = [ "Sunday", "M", "T", "W", "Th", "F", "S"];
+Date.prototype.getDaysOfCurrentWeek = function(start) {
+    // Array of all days of week
+    var days = [ "Sunday", "M", "T", "W", "Th", "F", "S"];
 
-   // Calculates date of first day of current week
-   start = start || 0;
-   var today = new Date(this.setHours(0, 0, 0, 0));
-   var day = today.getDay() - start;
-   var date = today.getDate() - day;
-   today.setDate(date);
-   // Then we are calculating all dates of current week and then reformat them into ISOO
-   var daysOfWeek = new Object();
-   for(i = 0; i < 8; i++) {
-       tmp = new Date();
-       tmp.setDate(today.getDate() + i);
-//       daysOfWeek[days[i]] = tmp.getFullYear()+'-'+(tmp.getMonth()+1)+'-'+tmp.getDate();
-       daysOfWeek[days[i]] = tmp.toISOString().substr(0,10);
-   }
+    // use timezoneoffset
+    var tzoffset = (new Date()).getTimezoneOffset() * 60000;
+
+    // Calculates date of first day of current week
+    start = start || 0;
+    var today = new Date(this.setHours(0, 0, 0, 0));
+    var day = today.getDay() - start;
+    var date = today.getDate() - day;
+    today.setDate(date);
+    // Then we are calculating all dates of current week and then reformat them into ISOO
+    var daysOfWeek = new Object();
+    for(i = 0; i < 7; i++) {
+        tmp = new Date();
+        tmp.setDate(today.getDate() + i);
+        //       daysOfWeek[days[i]] = tmp.getFullYear()+'-'+(tmp.getMonth()+1)+'-'+tmp.getDate();
+        daysOfWeek[days[i]] = (new Date(tmp.getTime() - tzoffset)).toISOString().substr(0,10);
+    }
 
    return daysOfWeek;
 }
