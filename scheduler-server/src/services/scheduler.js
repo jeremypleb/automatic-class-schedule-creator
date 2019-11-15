@@ -85,7 +85,7 @@ module.exports = class Scheduler {
       });
     });
 
-    return this.days.some((day) => {
+    return this.days.every((day) => {
       const dayTimes = times[day];
 
       if (dayTimes.length < 2) {
@@ -100,6 +100,8 @@ module.exports = class Scheduler {
           return false;
         }
       }
+
+      return true;
     });
   }
 
