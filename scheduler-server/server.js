@@ -47,11 +47,18 @@ app.get('/classes', function (req, res, next) {
 app.post('/scheduler', function (req, res, next) {
     console.log(req.body);
 
-    const { semester, courseIds, blockedTime } = req.body;
+    let { semester, courseIds, blockedTime } = req.body;
     const dirPath = `../data/${semester}`;
 
-    // res.json({ schedules: {} });
-
+    // the files don't have the 'R' at the end, so we need to remove it if present
+    courseIds = courseIds.map((courseId) => {
+      if (courseId.slice(-1) === 'R') {
+        return courseId.slice(0,-1);
+      } else {
+        return courseId;
+      }
+    });
+    
     // TODO we can format the validSchedules and send back the response as the client expects
     const scheduler = new Scheduler(courseIds, blockedTime, dirPath);
     const validSchedules = scheduler.generateSchedules(1000);

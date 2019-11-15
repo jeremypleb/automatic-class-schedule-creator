@@ -81,7 +81,7 @@ module.exports = class Scheduler {
 
     this.days.forEach((day) => {
       times[day].sort((t1, t2) => {
-        return t1.start - t2.start;
+        return t1.time - t2.time;
       });
     });
 
@@ -97,8 +97,14 @@ module.exports = class Scheduler {
         const t2 = dayTimes[i + 1];
         
         if (t1.courseId !== t2.courseId) {
+          console.log('failed for: ');
+          console.log(i, 't1', t1);
+          console.log(i, 't2', t2);  
+          
           return false;
         }
+        // console.log(i, 't1', t1);
+        // console.log(i, 't2', t2);
       }
 
       return true;
