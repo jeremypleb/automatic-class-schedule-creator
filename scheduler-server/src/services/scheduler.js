@@ -39,8 +39,80 @@ module.exports = class Scheduler {
     return classes; // if we need them
   }
 
-  _noConflictsWithTimeBlock(section) {
-    return true;
+  _noConflictsWithTimeBlock(section, i) {
+    let times = {
+      mon: [],
+      tue: [],
+      wed: [],
+      thu: [],
+      fri: [],
+      sat: [],
+      sun: []
+    };
+
+    section.times.forEach((time) => {
+      const timeBlock1 = {
+        courseId: this.courseIds[i],
+        time: time.begin_time
+      }
+
+      const timeBlock2 = {
+        courseId: this.courseIds[i],
+        time: time.end_time
+      }
+
+      this._addTimeBlocks(timeBlock1, timeBlock2, times, time);
+    });
+
+    this.days.forEach((day) => {
+      this.blockedTime[day].forEach((block) => {
+        const block1 = {
+          courseId: 'CUSTOM',
+          time: block.start
+        }
+
+        const block2 = {
+          courseId: 'CUSTOM',
+          time: block.end
+        }
+
+        times[day].push(block1, block2);
+      });
+
+      times[day].sort((t1, t2) => {
+        return t1.time - t2.time;
+      });
+    });
+
+    return this.days.every((day) => {
+      const dayTimes = times[day];
+
+      if (dayTimes.length < 2) {
+        return true;
+      }
+
+      for (let i = 0; i < dayTimes.length - 1; i += 2) {
+        const t1 = dayTimes[i];
+        const t2 = dayTimes[i + 1];
+
+        if (t1.courseId !== t2.courseId) {
+          const t3 = dayTimes[i + 2];
+          
+          if (!!t3 && (t2.time === t3.time) && (t1.courseId === t3.courseId)) {
+            const t4 = dayTimes[i + 3];
+            
+            if (!!t4 && (t2.courseId === t4.courseId)) {
+              i += 2;
+              continue;
+            }
+          }
+
+          return false;
+        }
+      }
+      
+      return true;
+    });
   }
 
   _addTimeBlocks(timeBlock1, timeBlock2, times, time) {
@@ -97,9 +169,9 @@ module.exports = class Scheduler {
         const t2 = dayTimes[i + 1];
         
         if (t1.courseId !== t2.courseId) {
-          console.log('failed for: ');
-          console.log(i, 't1', t1);
-          console.log(i, 't2', t2);  
+          // console.log('failed for: ');
+          // console.log(i, 't1', t1);
+          // console.log(i, 't2', t2);  
           
           return false;
         }
@@ -116,7 +188,9 @@ module.exports = class Scheduler {
 
     // check for conflicts with blocked time
     classSections = classSections.map((sections) => {
-      return sections.filter(this._noConflictsWithTimeBlock)
+      return sections.filter((s, i) => {
+        return this._noConflictsWithTimeBlock(s, i);
+      });
     });
 
     // this is setup for getting each possible combination of classes
