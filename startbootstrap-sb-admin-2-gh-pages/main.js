@@ -424,10 +424,7 @@ function addEvents(eventName, start, end, days, classes = true) {
         newEvent.start = daysToDate[element] + 'T' + start + ':00';
         newEvent.end = daysToDate[element] + 'T' + end + ':00';
         newEvent.groupId = groupId;
-<<<<<<< HEAD
-=======
-        newEvent.description = "This is a test";
->>>>>>> changed a few things
+        
         source[i] = newEvent;
         i++;
 
