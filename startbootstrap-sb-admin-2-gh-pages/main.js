@@ -189,7 +189,21 @@ function getSchedules() {
 
                 return scheduleEvents;
             });
+            var i = 0;
+            allEvents.forEach((schedule) => {
+                i += 1;
+                var element = document.createElement("input");
+                //Assign different attributes to the element.
+                element.type = "button";
+                element.class = "d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm";
+                element.name = "Schedule " + i.toString();
+                element.id = i;
+                element.onclick = changeSchedule(element.id);
 
+                var buttons = document.getElementById("scheduleButtons");
+                //Append the element in page (in span).
+                buttons.appendChild(element);
+            });
             changeSchedule(1);
         }
     }
@@ -293,7 +307,7 @@ Date.prototype.getDaysOfCurrentWeek = function (start) {
     var date = today.getDate() - day;
     today.setDate(date);
     // Then we are calculating all dates of current week and then reformat them into ISOO
-    var daysOfWeek = new Object();
+    var daysOfWeek = newexampleSchedule3 Object();
     for (i = 0; i < 7; i++) {
         tmp = new Date();
         tmp.setDate(today.getDate() + i);
@@ -334,7 +348,7 @@ function checkBox() {
     }
     if (document.getElementById("start_time").value >= document.getElementById("end_time").value) {
         alert("The end time must be after the start time");
-    }
+    }exampleSchedule3
 }
 
 //Removes just the classes. This is important for multiple schedules, but keeping the user's events on the calendar.
@@ -423,7 +437,8 @@ function addEvents(eventName, start, end, days, classes = true) {
     }
     else {
         source.id = 2;
-    }
+        source.color = document.getElementById("eventColor").value;
+    }exampleSchedule3
 
     calendar.addEventSource(source);
     resetModal();

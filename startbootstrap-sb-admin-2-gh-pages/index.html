@@ -32,6 +32,8 @@
   <script src='packages/daygrid/main.js'></script>
   <script src='packages/timegrid/main.js'></script>
   <script src='packages/bootstrap/main.js'></script>
+  <script src='https://unpkg.com/popper.js/dist/umd/popper.min.js'></script>
+  <script src='https://unpkg.com/tooltip.js/dist/umd/tooltip.min.js'></script>
   <script src='main.js'></script>
 
 </head>
@@ -70,12 +72,12 @@
 
             <div id="scheduleButtons" class="d--flex align-items-end">
               <!--        <h1 class="h3 mb-0 text-gray-800">Dashboard</h1> -->
-              <button type="button" id="1" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"
+<!--              <button type="button" id="1" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"
                 onclick="changeSchedule(this.id)">Schedule 1</button>
               <button type="button" id="2" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"
                 onclick="changeSchedule(this.id)">Schedule 2</button>
               <button type="button" id="3" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"
-                onclick="changeSchedule(this.id)">Schedule 3</button>
+                onclick="changeSchedule(this.id)">Schedule 3</button> -->
             </div>
           </div>
 
@@ -105,13 +107,14 @@
                         value="F"> Friday </input>
                       <input class="checkbox-inline" type="checkbox" onchange="checkBox()" id="s" name="saturday"
                         value="S"> Saturday </input>
+                      <input type="color" id="eventColor" value="#2C85DC">
                     </div>
                     <br>
                     <br>
                     <label for="start_time"><b>Start Time (HH:MM AM/PM)</b></label>
                     <input class="form-control" onchange="checkBox()" type="time" min="7:00" max="20:00" id="start_time"
                       name="start_time" step="60" required>
-
+                    <br>
                     <label for="end_time"><b>End Time (HH:MM AM/PM)</b></label>
                     <input class="form-control" onchange="checkBox()" type="time" min="7:00" max="20:00" id="end_time"
                       name="end_time" step="60" required>
@@ -149,7 +152,23 @@
 
           <!-- Content Row -->
 
-          <div class="row">
+          <    var i = 0;
+    testSchedules.forEach((schedule) => {
+        i += 1;
+        var element = document.createElement("button");
+        //Assign different attributes to the element.
+        element.type = "button";
+        element.className = "d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm";
+        element.value = "Schedule " + i.toString();
+        element.id = i;
+        element.onclick = function() {
+            changeSchedule(this.id);
+        };
+
+        var buttons = document.getElementById("scheduleButtons");
+        //Append the element in page (in span).
+        buttons.appendChild(element);
+    });div class="row">
 
             <!-- Adding Classes -->
             <div class="col-xl-12 mb-4">
@@ -173,7 +192,7 @@
                 </form>-->
 
                 <!-- Card Body -->
-                <div class="card-body">
+                <div class="card-boallEventsdy">
                   <div class="row">
                     <div class="col-3">
                       <h7>Term</h7>
@@ -275,7 +294,6 @@
 
   <!-- Custom scripts for all pages-->
   <script src="js/sb-admin-2.min.js"></script>
-
 
 </body>
 
