@@ -152,23 +152,7 @@
 
           <!-- Content Row -->
 
-          <    var i = 0;
-    testSchedules.forEach((schedule) => {
-        i += 1;
-        var element = document.createElement("button");
-        //Assign different attributes to the element.
-        element.type = "button";
-        element.className = "d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm";
-        element.value = "Schedule " + i.toString();
-        element.id = i;
-        element.onclick = function() {
-            changeSchedule(this.id);
-        };
-
-        var buttons = document.getElementById("scheduleButtons");
-        //Append the element in page (in span).
-        buttons.appendChild(element);
-    });div class="row">
+          <div class="row">
 
             <!-- Adding Classes -->
             <div class="col-xl-12 mb-4">

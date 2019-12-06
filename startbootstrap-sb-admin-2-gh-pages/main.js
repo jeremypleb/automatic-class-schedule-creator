@@ -307,7 +307,7 @@ Date.prototype.getDaysOfCurrentWeek = function (start) {
     var date = today.getDate() - day;
     today.setDate(date);
     // Then we are calculating all dates of current week and then reformat them into ISOO
-    var daysOfWeek = newexampleSchedule3 Object();
+    var daysOfWeek = new Object();
     for (i = 0; i < 7; i++) {
         tmp = new Date();
         tmp.setDate(today.getDate() + i);
@@ -348,7 +348,7 @@ function checkBox() {
     }
     if (document.getElementById("start_time").value >= document.getElementById("end_time").value) {
         alert("The end time must be after the start time");
-    }exampleSchedule3
+    }
 }
 
 //Removes just the classes. This is important for multiple schedules, but keeping the user's events on the calendar.
@@ -424,6 +424,10 @@ function addEvents(eventName, start, end, days, classes = true) {
         newEvent.start = daysToDate[element] + 'T' + start + ':00';
         newEvent.end = daysToDate[element] + 'T' + end + ':00';
         newEvent.groupId = groupId;
+<<<<<<< HEAD
+=======
+        newEvent.description = "This is a test";
+>>>>>>> changed a few things
         source[i] = newEvent;
         i++;
 
@@ -438,7 +442,7 @@ function addEvents(eventName, start, end, days, classes = true) {
     else {
         source.id = 2;
         source.color = document.getElementById("eventColor").value;
-    }exampleSchedule3
+    }
 
     calendar.addEventSource(source);
     resetModal();
