@@ -34,3 +34,7 @@
 .hover:hover {
   cursor: pointer;
 }
+
+.schedule-dynamic-button {
+  margin: auto 6px;
+}
