@@ -63,7 +63,7 @@ app.post('/scheduler', function (req, res, next) {
     const scheduler = new Scheduler(courseIds, blockedTime, dirPath);
     const validSchedules = scheduler.generateSchedules(1000);
 
-    const schedulesToSend = validSchedules.splice(0, 3);
+    const schedulesToSend = validSchedules.splice(0, 10);
 
     res.json({ schedules: schedulesToSend });
 

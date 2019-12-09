@@ -189,6 +189,40 @@ function getSchedules() {
 
                 return scheduleEvents;
             });
+            // var i = 0;
+            // allEvents.forEach((schedule) => {
+            //     i += 1;
+            //     var element = document.createElement("input");
+            //     //Assign different attributes to the element.
+            //     element.type = "button";
+            //     element.class = "d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm";
+            //     element.name = "Schedule " + i.toString();
+            //     element.id = i;
+            //     element.onclick = changeSchedule(element.id);
+
+            //     var buttons = document.getElementById("scheduleButtons");
+            //     //Append the element in page (in span).
+            //     buttons.appendChild(element);
+            // });
+
+            Array.from(document.getElementsByClassName('schedule-dynamic-button')).forEach((button) => {
+              button.remove();
+            });
+
+            let buttons = document.getElementById('scheduleButtons');
+
+            allEvents.forEach((schedule, index) => {
+              const i = index + 1;
+              
+              let button = document.createElement('button');
+              
+              button.innerHTML = `Schedule ${i}`;
+              button.classList = 'd-none d-sm-inline-block btn btn-sm btn-primary shadow-sm schedule-dynamic-button';
+              button.id = i;
+              button.onclick = () => changeSchedule(i);
+
+              buttons.appendChild(button);
+            })
 
             changeSchedule(1);
         }
@@ -410,6 +444,7 @@ function addEvents(eventName, start, end, days, classes = true) {
         newEvent.start = daysToDate[element] + 'T' + start + ':00';
         newEvent.end = daysToDate[element] + 'T' + end + ':00';
         newEvent.groupId = groupId;
+        
         source[i] = newEvent;
         i++;
 
@@ -423,6 +458,7 @@ function addEvents(eventName, start, end, days, classes = true) {
     }
     else {
         source.id = 2;
+        source.color = document.getElementById("eventColor").value;
     }
 
     calendar.addEventSource(source);
